@@ -8,8 +8,7 @@ namespace Labb_02_dungeon_crawler
     {
         private static void Main(string[] args)
         {
-            Console.WriteLine("Player: Luwi");
-            Console.WriteLine("Enemy: ????");
+            
 
             var smallChoice = MenuViewer.View(new List<string> { "aaa", "bbbb", "ccccc" });
             Console.WriteLine("You choose:");
@@ -28,6 +27,25 @@ namespace Labb_02_dungeon_crawler
             });
             Console.WriteLine("You choose:");
             Console.WriteLine(bigChoice);
+
+            // Först ska jag kolla om det finns en databas.
+            // Om det inte finns ska jag skapa en.
+            // - sen ska användaren skriva in sitt namn.
+            // - sen välja bana
+            // - sen börjar spelet
+            // - efter varje drag man gör ska spelet sparas
+            // Om det finns en databas:
+            // - Låt användaren välja att fortsätta det senaste spelet
+            // - eller ladda in ett annat pågående spel
+            // - eller ta bort ett pågående spel 
+            // - eller starta ett nytt spel:
+            // - - sen skriva in sitt namn
+            // - - sen välja bana
+            // - - sen börjar spelet
+
+
+            Console.WriteLine("Player: Luwi");
+            Console.WriteLine("Enemy: ????");
 
             LevelData levelData = new LevelData();
             levelData.Load("C:\\Users\\ludwi\\source\\repos\\Labb_02_dungeon_crawler\\LevelElement\\bin\\Debug\\net8.0\\Level1.txt");
