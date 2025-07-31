@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35219.272
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Databases_Labb_03_dungeon_crawler_with_MongoDB", "Databases_Labb_03_dungeon_crawler_with_MongoDB\Databases_Labb_03_dungeon_crawler_with_MongoDB.csproj", "{B4E4C4F3-3139-41B6-9830-4C550F8C6886}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B4E4C4F3-3139-41B6-9830-4C550F8C6886}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4E4C4F3-3139-41B6-9830-4C550F8C6886}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4E4C4F3-3139-41B6-9830-4C550F8C6886}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4E4C4F3-3139-41B6-9830-4C550F8C6886}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A1631E9D-94CA-4E2F-9DD1-F1326CA6EADB}
+	EndGlobalSection
+EndGlobal
