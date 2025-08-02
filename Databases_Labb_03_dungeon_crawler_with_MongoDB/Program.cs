@@ -1,6 +1,10 @@
 ﻿
 // Om jag inte hade klickat i "Do not use top level statement" när jag skapade detta projekt, så hade jag inte behövt skriva namespace runt varje klass.
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.Model;
+using MongoDB.Driver;
+using System.Reflection.Metadata;
+using System.Security.Cryptography;
 
 namespace Labb_02_dungeon_crawler
 {
@@ -42,6 +46,64 @@ namespace Labb_02_dungeon_crawler
             // - - sen skriva in sitt namn
             // - - sen välja bana
             // - - sen börjar spelet
+
+            //var dbClient = new MongoClient("localhost:27017");
+            var dbClient = new MongoClient("mongodb://localhost:27017");
+            string dbName = "LudwigAndersson";
+
+            var db = dbClient.GetDatabase(dbName);
+
+            //(IMongoCollection<User> users, IMongoCollection<Level> levels, IMongoCollection<Game> games) = DatabaseService.InitializeDatabase(db);
+            var (users, levels, games) = DatabaseService.InitializeDatabase(db);
+
+            //bool userCollectionExists = db.ListCollectionNames().ToList().Contains("users");
+            //bool levelCollectionExists = db.ListCollectionNames().ToList().Contains("levels");
+            //bool gameCollectionExists = db.ListCollectionNames().ToList().Contains("games");
+
+            bool userCollectionHasData  = db.GetCollection< User>( "users").Find(FilterDefinition< User>.Empty).Any();
+            bool levelCollectionHasData = db.GetCollection<Level>("levels").Find(FilterDefinition<Level>.Empty).Any();
+            bool gameCollectionHasData  = db.GetCollection< Game>( "games").Find(FilterDefinition< Game>.Empty).Any();
+
+            //bool levelCollectionHasData = db.ListCollectionNames().ToList().Contains("levels");
+
+
+            string? username;
+            if (!userCollectionHasData)
+            {
+                while (true)
+                {
+                    Console.WriteLine("Enter your username, max 10 characters:");
+                    username = Console.ReadLine();
+
+                    if(username != null && username?.Length <= 10)
+                    {
+                        User currentUser = new User { Name = username };
+
+                        //users.InsertOne(currentUser);
+
+                        try
+                        {
+                            users.InsertOne(currentUser);
+                            Console.WriteLine($"User inserted with ID: {currentUser.Id}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Fel vid insert:");
+                            Console.WriteLine(ex.Message);
+                        }
+
+
+                        break;
+                    }
+                    else
+                    {
+                        Console.Clear();
+                    }
+                }
+            }
+
+
+            
 
 
             Console.WriteLine("Player: Luwi");
