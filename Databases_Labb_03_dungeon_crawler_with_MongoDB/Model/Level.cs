@@ -13,5 +13,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Model
     {
         [BsonId]
         public ObjectId Id { get; set; }
+
+        [BsonElement("name")]
+        public string Name { get; set; }
     }
 }

@@ -14,23 +14,24 @@ namespace Labb_02_dungeon_crawler
         {
             
 
-            var smallChoice = MenuViewer.View(new List<string> { "aaa", "bbbb", "ccccc" });
-            Console.WriteLine("You choose:");
-            Console.WriteLine(smallChoice);
-            Thread.Sleep(1000);
+            //var smallChoice = MenuViewer.View(new List<string> { "aaa", "bbbb", "ccccc" });
+            //Console.WriteLine("You choose:");
+            //Console.WriteLine(smallChoice);
+            //Thread.Sleep(1000);
 
-            var bigChoice = MenuViewer.View(new List<string> { 
-                "aaa", 
-                "bbbb", 
-                "ccccc",
-                "dddddd",
-                "eeeeeee",
-                "ffffffff",
-                "ggggggggg",
-                "hhhhhhhhhh",
-            });
-            Console.WriteLine("You choose:");
-            Console.WriteLine(bigChoice);
+            //var bigChoice = MenuViewer.View(new List<string> { 
+            //    "aaa", 
+            //    "bbbb", 
+            //    "ccccc",
+            //    "dddddd",
+            //    "eeeeeee",
+            //    "ffffffff",
+            //    "ggggggggg",
+            //    "hhhhhhhhhh",
+            //});
+            //Console.WriteLine("You choose:");
+            //Console.WriteLine(bigChoice);
+
 
             // Först ska jag kolla om det finns en databas.
             // Om det inte finns ska jag skapa en.
@@ -68,6 +69,7 @@ namespace Labb_02_dungeon_crawler
 
 
             string? username;
+            string? level;
             if (!userCollectionHasData)
             {
                 while (true)
@@ -81,16 +83,17 @@ namespace Labb_02_dungeon_crawler
 
                         //users.InsertOne(currentUser);
 
-                        try
-                        {
-                            users.InsertOne(currentUser);
-                            Console.WriteLine($"User inserted with ID: {currentUser.Id}");
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine("Fel vid insert:");
-                            Console.WriteLine(ex.Message);
-                        }
+                        //try
+                        //{
+                        //    users.InsertOne(currentUser);
+                        //    Console.WriteLine($"User inserted with ID: {currentUser.Id}");
+                        //}
+                        //catch (Exception ex)
+                        //{
+                        //    Console.WriteLine("Fel vid insert:");
+                        //    Console.WriteLine(ex.Message);
+                        //}
+                        DatabaseService.SaveToDb(users, currentUser);
 
 
                         break;
@@ -102,7 +105,39 @@ namespace Labb_02_dungeon_crawler
                 }
             }
 
+            while (true)
+            {
+                Console.WriteLine("What do you want to do now?");
+                List<string> tmpOptions = new List<string>
+                {
+                    "Start a new game.",
+                    "Create a new user.",
+                    "Load a user.",
+                };
 
+                var tmpSelected = MenuViewer.View(tmpOptions);
+
+                switch (tmpSelected)
+                {
+                    case 0:
+                        Console.WriteLine("You choose to create a new game.");
+                        DatabaseService.Choose
+                        break;
+                    case 1:
+                        Console.WriteLine("You choose to create a new user.");
+                        DatabaseService.CreateUser(users);
+                        break;
+                    case 2:
+                        Console.WriteLine("You choose to load an existing user.");
+                        DatabaseService.LoadUser(users);
+                        Console.ReadLine();
+                        break;
+                    default:
+                        Console.WriteLine("Something went wrong. Your selected option is not supported.");
+                        break;
+                }
+
+            }
             
 
 
