@@ -5,7 +5,8 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Labb_02_dungeon_crawler;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.Types;
 
 namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
 {

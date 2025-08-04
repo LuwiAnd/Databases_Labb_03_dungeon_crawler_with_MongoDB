@@ -5,61 +5,60 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.States;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.Types;
 
-namespace Labb_02_dungeon_crawler
+namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
 {
     internal class Snake : Enemy
     {
-        //private int[] _position;
-
-        //public override int[] Position
-        //{
-        //    get { return this._position; }
-        //    // positionen får endast sättas av konstruktorn, eller av Update-funktionen.
-        //}
-        //public string Type { get; set; }
-        //public double HP { get; set; }
-
-        //Dice AttackDice = new Dice(numberOfDice: 3, sidesPerDice: 4, modifier: 2);
-        //Dice DefenceDice = new Dice(numberOfDice: 1, sidesPerDice: 8, modifier: 5);
+        
 
         //public override void Update(Hero hero, List<LevelElement> elements)
         public override void Update(Hero hero, LevelData levelData)
         {
-            this.Move(hero, levelData);
-            this.IsVisible = GeneralDungeonFunctions.IsVisible(hero.Position, this.Position);
-            if (!this.IsVisible) { GeneralDungeonFunctions.Erase(this.Position.X, this.Position.Y); }
+            Move(hero, levelData);
+            IsVisible = GeneralDungeonFunctions.IsVisible(hero.Position, Position);
+            if (!IsVisible) { GeneralDungeonFunctions.Erase(Position.X, Position.Y); }
         }
 
         //public Snake(int[] position)
         public Snake(int positionX, int positionY)
         {
             //this._position = position;
-            this.Position = new Position(x: positionX, y: positionY);
-            this.Color = ConsoleColor.Green;
-            this.HP = 25;
-            this.Type = "snake";
-            this.AttackDice = new Dice(numberOfDice: 3, sidesPerDice: 4, modifier: 2);
-            this.DefenceDice = new Dice(numberOfDice: 1, sidesPerDice: 8, modifier: 5);
+            Position = new Position(x: positionX, y: positionY);
+            HP = 25;
+            Color = ConsoleColor.Green;
+            Type = "snake";
+            AttackDice = new Dice(numberOfDice: 3, sidesPerDice: 4, modifier: 2);
+            DefenceDice = new Dice(numberOfDice: 1, sidesPerDice: 8, modifier: 5);
+        }
+
+        public Snake(SnakeState state)
+        {
+            Position = state.Position;
+            HP = state.HP;
+            Color = ConsoleColor.Green;
+            Type = "snake";
+            AttackDice = new Dice(numberOfDice: 3, sidesPerDice: 4, modifier: 2);
+            DefenceDice = new Dice(numberOfDice: 1, sidesPerDice: 8, modifier: 5);
         }
 
         public override void Draw()
         {
             (int left, int top) = Console.GetCursorPosition();
             Console.SetCursorPosition(
-                this.Position.X + GeneralDungeonFunctions.mapDisplacementX, 
-                this.Position.Y + GeneralDungeonFunctions.mapDisplacementY
+                Position.X + GeneralDungeonFunctions.mapDisplacementX,
+                Position.Y + GeneralDungeonFunctions.mapDisplacementY
             );
-            Console.ForegroundColor = this.Color;
+            Console.ForegroundColor = Color;
             Console.Write(GeneralDungeonFunctions.snakeChar.ToString());
 
             Console.ForegroundColor = ConsoleColor.White;
             Console.SetCursorPosition(left, top);
         }
 
-        //public bool Move(string direction, List<LevelElement> elements)
-            //bool snakeMoved = false;
-            //Position adjacentPosition = GeneralDungeonFunctions.GetAdjacentPosition(this.Position, direction);
+        
         //public void Move(Hero hero, List<LevelElement> elements)
         public void Move(Hero hero, LevelData levelData)
         {
@@ -76,10 +75,10 @@ namespace Labb_02_dungeon_crawler
                 "right"
             };
             Position adjacentPosition;
-            foreach(string relativePosition in relativePositions)
+            foreach (string relativePosition in relativePositions)
             {
-                adjacentPosition = GeneralDungeonFunctions.GetAdjacentPosition(this.Position, relativePosition);
-                if(adjacentPosition.X == hero.Position.X && adjacentPosition.Y == hero.Position.Y)
+                adjacentPosition = GeneralDungeonFunctions.GetAdjacentPosition(Position, relativePosition);
+                if (adjacentPosition.X == hero.Position.X && adjacentPosition.Y == hero.Position.Y)
                 {
                     //snakeIsNextToHero = true;
                     herosRelativePosition = relativePosition;
@@ -87,8 +86,8 @@ namespace Labb_02_dungeon_crawler
             }
 
             Position fleePosition = GeneralDungeonFunctions.GetAdjacentPosition(
-                    this.Position,
-                    this.ReverseRelativePosition(herosRelativePosition)
+                    Position,
+                    ReverseRelativePosition(herosRelativePosition)
                 );
             bool possibleToFlee = GeneralDungeonFunctions.isPositionEmpty(
                 fleePosition,
@@ -96,13 +95,13 @@ namespace Labb_02_dungeon_crawler
             );
             if (possibleToFlee)
             {
-                GeneralDungeonFunctions.Erase(this.Position.X, this.Position.Y);
-                this.Position = fleePosition;
-                this.Draw();
+                GeneralDungeonFunctions.Erase(Position.X, Position.Y);
+                Position = fleePosition;
+                Draw();
             }
             else
             {
-                this.Draw();
+                Draw();
             }
         }
 
@@ -112,17 +111,17 @@ namespace Labb_02_dungeon_crawler
             {
                 case "above":
                     return "below";
-                    //break; // Eftersom koden ovan är ett return-statement, så behövs ej break.
+                //break; // Eftersom koden ovan är ett return-statement, så behövs ej break.
                 case "below":
                     return "above";
-                    //break;
+                //break;
                 case "left":
                     return "right";
-                    //break;
+                //break;
                 case "right":
                     return "left";
-                    //break;
-                default: 
+                //break;
+                default:
                     return "";
                     //break;
             }

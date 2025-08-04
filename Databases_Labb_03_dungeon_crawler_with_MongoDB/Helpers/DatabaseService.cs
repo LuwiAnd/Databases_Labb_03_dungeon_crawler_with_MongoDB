@@ -1,4 +1,4 @@
-﻿using Databases_Labb_03_dungeon_crawler_with_MongoDB.Model;
+﻿using Databases_Labb_03_dungeon_crawler_with_MongoDB.SaveModel;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;

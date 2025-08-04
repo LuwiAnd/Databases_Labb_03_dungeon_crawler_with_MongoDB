@@ -5,8 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.States;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.Types;
 
-namespace Labb_02_dungeon_crawler
+namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
 {
     internal class Hero : LevelElement
     {
@@ -24,7 +26,7 @@ namespace Labb_02_dungeon_crawler
         //public override Position Position { get => base.Position; protected set => base.Position = value; }
         private void SetPosition(Position p)
         {
-            this.Position = p;
+            Position = p;
         }
 
         public new string Type { get; set; }
@@ -33,27 +35,40 @@ namespace Labb_02_dungeon_crawler
         public Dice AttackDice = new Dice(numberOfDice: 2, sidesPerDice: 6, modifier: 2);
         public Dice DefenceDice = new Dice(numberOfDice: 2, sidesPerDice: 6, modifier: 0);
 
-        
+
 
         //public Hero(int[] position)
         public Hero(int positionX, int positionY)
         {
             //this._position = position;
-            this.Position = new Position(x: positionX, y: positionY);
-            this.HP = 100;
-            this.Type = "hero";
+            Position = new Position(x: positionX, y: positionY);
+            HP = 100;
+            Type = "hero";
 
-            this.Color = ConsoleColor.Green;
-            this.Appearance = GeneralDungeonFunctions.playerChar;
+            Color = ConsoleColor.Green;
+            Appearance = GeneralDungeonFunctions.playerChar;
         }
+
+        public Hero(HeroState state)
+        {
+            Position = state.Position;
+            HP = state.HP;
+            Type = "hero";
+            Color = ConsoleColor.Green;
+            Appearance = GeneralDungeonFunctions.playerChar;
+
+            AttackDice = new Dice(2, 6, 2);
+            DefenceDice = new Dice(2, 6, 0);
+        }
+
 
         public override void Draw()
         {
             (int left, int top) = Console.GetCursorPosition();
             //Console.SetCursorPosition(this._position[0] + GeneralDungeonFunctions.mapDisplacementX, this._position[1] + GeneralDungeonFunctions.mapDisplacementY);
-            Console.SetCursorPosition(this.Position.X + GeneralDungeonFunctions.mapDisplacementX, this.Position.Y + GeneralDungeonFunctions.mapDisplacementY);
-            Console.ForegroundColor = this.Color;
-            Console.Write(this.Appearance.ToString());
+            Console.SetCursorPosition(Position.X + GeneralDungeonFunctions.mapDisplacementX, Position.Y + GeneralDungeonFunctions.mapDisplacementY);
+            Console.ForegroundColor = Color;
+            Console.Write(Appearance.ToString());
             Console.ForegroundColor = ConsoleColor.White;
             Console.SetCursorPosition(left, top);
 
@@ -125,8 +140,9 @@ namespace Labb_02_dungeon_crawler
                             this.Move("up");
                         }
                         */
-                        okDirection = this.HandleArrowKeys(direction: "up", levelData: levelData);
-                    }else if (cki.Key == ConsoleKey.LeftArrow)
+                        okDirection = HandleArrowKeys(direction: "up", levelData: levelData);
+                    }
+                    else if (cki.Key == ConsoleKey.LeftArrow)
                     {
                         /*
                         //okDirection = true;
@@ -156,8 +172,9 @@ namespace Labb_02_dungeon_crawler
                             this.Move("left");
                         }
                         */
-                        okDirection = this.HandleArrowKeys(direction: "left", levelData: levelData);
-                    }else if (cki.Key == ConsoleKey.DownArrow)
+                        okDirection = HandleArrowKeys(direction: "left", levelData: levelData);
+                    }
+                    else if (cki.Key == ConsoleKey.DownArrow)
                     {
                         /*
                         foreach (var element in elements)
@@ -188,8 +205,9 @@ namespace Labb_02_dungeon_crawler
                         }
                         */
 
-                        okDirection = this.HandleArrowKeys(direction: "down", levelData: levelData);
-                    }else if (cki.Key == ConsoleKey.RightArrow)
+                        okDirection = HandleArrowKeys(direction: "down", levelData: levelData);
+                    }
+                    else if (cki.Key == ConsoleKey.RightArrow)
                     {
                         /* 
                         //okDirection = true;
@@ -224,7 +242,7 @@ namespace Labb_02_dungeon_crawler
                             this.Move("right");
                         }
                         */
-                        okDirection = this.HandleArrowKeys(direction: "right", levelData: levelData);
+                        okDirection = HandleArrowKeys(direction: "right", levelData: levelData);
                     }
                     else
                     {
@@ -237,8 +255,9 @@ namespace Labb_02_dungeon_crawler
 
         private bool HandleArrowKeys(string direction, LevelData levelData)
         {
-            Position positionToMoveTo = this.Position;
-            switch(direction){
+            Position positionToMoveTo = Position;
+            switch (direction)
+            {
                 case "up":
                     positionToMoveTo.Y -= 1;
                     break;
@@ -279,7 +298,7 @@ namespace Labb_02_dungeon_crawler
                 //this.Position[0]++;
                 //this.SetPosition(new Position(x: this.Position.X + 1, y: this.Position.Y));
                 //this.Move("right");
-                this.Move(direction);
+                Move(direction);
             }
 
             return okDirection;
@@ -297,40 +316,40 @@ namespace Labb_02_dungeon_crawler
             (int left, int top) = Console.GetCursorPosition();
             Console.SetCursorPosition(0, 0);
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Player (HP: {this.HP}) throw dices: {this.AttackDice.ToString()} => {heroAttack}. {enemy.Type} (HP: {enemy.HP}) throw: {enemy.DefenceDice.ToString()} => {enemyDefence}. Damage = {enemyDamage}.");
+            Console.WriteLine($"Player (HP: {HP}) throw dices: {AttackDice.ToString()} => {heroAttack}. {enemy.Type} (HP: {enemy.HP}) throw: {enemy.DefenceDice.ToString()} => {enemyDefence}. Damage = {enemyDamage}.");
             Console.ForegroundColor = ConsoleColor.White;
             Console.SetCursorPosition(left, top);
-            
+
         }
 
         public void Move(string direction)
         {
             (int left, int top) = Console.GetCursorPosition();
-            Console.SetCursorPosition(this.Position.X + GeneralDungeonFunctions.mapDisplacementX, this.Position.Y + GeneralDungeonFunctions.mapDisplacementY);
+            Console.SetCursorPosition(Position.X + GeneralDungeonFunctions.mapDisplacementX, Position.Y + GeneralDungeonFunctions.mapDisplacementY);
             Console.Write(' ');
             if (direction == "up")
             {
-                this.SetPosition(new Position(x: this.Position.X, y: this.Position.Y - 1));
-                this.Draw();
+                SetPosition(new Position(x: Position.X, y: Position.Y - 1));
+                Draw();
             }
-            else if(direction == "down")
+            else if (direction == "down")
             {
-                this.SetPosition(new Position(x: this.Position.X, y: this.Position.Y + 1));
-                this.Draw();
+                SetPosition(new Position(x: Position.X, y: Position.Y + 1));
+                Draw();
             }
             else if (direction == "left")
             {
-                this.SetPosition(new Position(x: this.Position.X - 1, y: this.Position.Y));
-                this.Draw();
+                SetPosition(new Position(x: Position.X - 1, y: Position.Y));
+                Draw();
             }
             else if (direction == "right")
             {
-                this.SetPosition(new Position(x: this.Position.X + 1, y: this.Position.Y));
-                this.Draw();
+                SetPosition(new Position(x: Position.X + 1, y: Position.Y));
+                Draw();
             }
             Console.SetCursorPosition(left, top);
         }
 
-        
+
     }
 }

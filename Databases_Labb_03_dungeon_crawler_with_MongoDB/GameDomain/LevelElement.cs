@@ -1,5 +1,6 @@
-﻿
-namespace Labb_02_dungeon_crawler
+﻿using Databases_Labb_03_dungeon_crawler_with_MongoDB.Types;
+
+namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
 {
     // Om jag inte hade skrivit att denna klass skulle vara public, så 
     // hade den blivit internal, vilket betyder att alla klasser i samma 

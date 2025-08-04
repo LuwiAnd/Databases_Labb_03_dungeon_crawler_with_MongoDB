@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Labb_02_dungeon_crawler
+namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
 {
     public class Dice
     {
@@ -21,18 +21,18 @@ namespace Labb_02_dungeon_crawler
 
         public int Throw()
         {
-            int sum = this.modifier;
+            int sum = modifier;
             Random random = new Random();
-            for(int i = 0; i < this.numberOfDice; i++)
+            for (int i = 0; i < numberOfDice; i++)
             {
-                sum += random.Next(1, this.sidesPerDice + 1);
+                sum += random.Next(1, sidesPerDice + 1);
             }
             return sum;
         }
 
         public override string ToString()
         {
-            return this.numberOfDice + "d" + this.sidesPerDice + "+" + this.modifier;
+            return numberOfDice + "d" + sidesPerDice + "+" + modifier;
         }
     }
 }

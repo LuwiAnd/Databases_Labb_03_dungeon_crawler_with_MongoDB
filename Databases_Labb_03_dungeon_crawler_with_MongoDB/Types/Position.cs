@@ -1,4 +1,5 @@
-﻿public struct Position
+﻿namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Types;
+public struct Position
 {
     public int X { get; set; }
     public int Y { get; set; }

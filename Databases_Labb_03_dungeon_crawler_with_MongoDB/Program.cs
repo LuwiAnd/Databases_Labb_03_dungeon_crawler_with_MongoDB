@@ -1,7 +1,9 @@
 ﻿
 // Om jag inte hade klickat i "Do not use top level statement" när jag skapade detta projekt, så hade jag inte behövt skriva namespace runt varje klass.
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.GameObjects;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers;
-using Databases_Labb_03_dungeon_crawler_with_MongoDB.Model;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.SaveModel;
 using MongoDB.Driver;
 using System.Reflection.Metadata;
 using System.Security.Cryptography;
@@ -105,6 +107,30 @@ namespace Labb_02_dungeon_crawler
                 }
             }
 
+            string levelsFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Levels");
+            if (!levelCollectionHasData)
+            {
+                if (Directory.Exists(levelsFolder))
+                {
+                    var txtFiles = Directory.GetFiles(levelsFolder, "*.txt");
+
+                    foreach(var filePath in txtFiles)
+                    {
+                        var levelData = new LevelData();
+                        levelData.Load(filePath);
+                        levelData.TurnsUntilClearingMessages = 3;
+
+                        Level tmpLevel = new Level
+                        {
+                            Name = Path.GetFileNameWithoutExtension(filePath)
+                        };
+
+                        levels.InsertOne(tmpLevel);
+                    }
+                }
+            }
+
+
             while (true)
             {
                 Console.WriteLine("What do you want to do now?");
@@ -121,7 +147,7 @@ namespace Labb_02_dungeon_crawler
                 {
                     case 0:
                         Console.WriteLine("You choose to create a new game.");
-                        DatabaseService.Choose
+                        DatabaseService.LoadLevels();
                         break;
                     case 1:
                         Console.WriteLine("You choose to create a new user.");
@@ -144,9 +170,9 @@ namespace Labb_02_dungeon_crawler
             Console.WriteLine("Player: Luwi");
             Console.WriteLine("Enemy: ????");
 
-            LevelData levelData = new LevelData();
-            levelData.Load("C:\\Users\\ludwi\\source\\repos\\Labb_02_dungeon_crawler\\LevelElement\\bin\\Debug\\net8.0\\Level1.txt");
-            levelData.TurnsUntilClearingMessages = 3;
+            //LevelData levelData = new LevelData();
+            //levelData.Load("C:\\Users\\ludwi\\source\\repos\\Labb_02_dungeon_crawler\\LevelElement\\bin\\Debug\\net8.0\\Level1.txt");
+            //levelData.TurnsUntilClearingMessages = 3;
 
             bool gameOver = false;
             while (!gameOver)
