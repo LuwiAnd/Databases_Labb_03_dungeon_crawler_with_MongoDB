@@ -17,7 +17,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
             //set; // Denna property ska vara readonly.
         }
 
-        public Hero hero;
+        //public Hero hero;
+        public Hero Hero { get; set; }
 
         public int TurnsUntilClearingMessages { get; set; }
 
@@ -60,7 +61,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                             if (line[x] == GeneralDungeonFunctions.playerChar)
                             {
                                 //this.hero = new Hero(new int[] { x, y });
-                                hero = new Hero(x, y);
+                                //hero = new Hero(x, y);
+                                Hero = new Hero(x, y);
 
                                 //Console.WriteLine($"A new hero was added at position x = {x}, y = {y}.");
                             }
@@ -74,7 +76,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                 Console.WriteLine("The file could not be read:");
                 Console.WriteLine(e.Message);
             }
-            hero.Draw();
+            //hero.Draw();
+            Hero.Draw();
         }
 
         public void RemoveElements()
@@ -98,7 +101,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                 {
                     //Console.WriteLine("Moving a snake!");
                     Wall wall = (Wall)element;
-                    wall.Update(hero);
+                    //wall.Update(hero);
+                    wall.Update(Hero);
                 }
             }
         }
@@ -111,7 +115,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                 {
                     Snake snake = (Snake)element;
                     //snake.Update(this.hero, this.Elements);
-                    snake.Update(hero, this);
+                    //snake.Update(hero, this);
+                    snake.Update(Hero, this);
                 }
             }
         }
@@ -124,7 +129,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                 {
                     Rat rat = (Rat)element;
                     //rat.Update(this.hero, this.Elements);
-                    rat.Update(hero, this);
+                    //rat.Update(hero, this);
+                    rat.Update(Hero, this);
                 }
             }
         }

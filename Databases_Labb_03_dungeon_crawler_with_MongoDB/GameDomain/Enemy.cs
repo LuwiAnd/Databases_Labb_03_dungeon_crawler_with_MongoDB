@@ -5,13 +5,6 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
 {
     abstract class Enemy : LevelElement
     {
-        //private int[] _position;
-
-        //public override int[] Position
-        //{
-        //    get { return this._position; }
-        //    // positionen får endast sättas av konstruktorn, eller av Update-funktionen.
-        //}
         //public string Type { get; set; }
         public double HP { get; set; }
 

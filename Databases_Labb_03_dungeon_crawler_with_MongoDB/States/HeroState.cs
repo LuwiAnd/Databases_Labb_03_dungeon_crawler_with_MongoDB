@@ -9,9 +9,9 @@ using Databases_Labb_03_dungeon_crawler_with_MongoDB.Types;
 
 namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.States
 {
-    internal class HeroState
+    internal class HeroState : LevelElementState
     {
-        public Position Position { get; set; } = new Position();
+        //public Position Position { get; set; } = new Position(); // Finns redan i LevelElementState.
         public double HP { get; set; }
 
         public HeroState() { }

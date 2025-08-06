@@ -181,14 +181,14 @@ namespace Labb_02_dungeon_crawler
                 else GeneralDungeonFunctions.ClearConsoleMessages();
 
                 //levelData.hero.Update(levelData.Elements);
-                levelData.hero.Update(levelData);
-                if (CheckIsHeroDead(levelData.hero)) break;
+                levelData.Hero.Update(levelData);
+                if (CheckIsHeroDead(levelData.Hero)) break;
 
                 levelData.UpdateWalls();
                 levelData.UpdateSnakes();
-                if (CheckIsHeroDead(levelData.hero)) break;
+                if (CheckIsHeroDead(levelData.Hero)) break;
                 levelData.UpdateRats();
-                if (CheckIsHeroDead(levelData.hero)) break;
+                if (CheckIsHeroDead(levelData.Hero)) break;
 
                 levelData.hero.Draw();
                 levelData.EraseDeadElements();
