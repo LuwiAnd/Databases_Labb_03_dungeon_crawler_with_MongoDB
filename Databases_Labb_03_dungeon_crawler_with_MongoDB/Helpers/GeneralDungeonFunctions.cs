@@ -16,6 +16,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
         public const char ratChar = 'r';
         public const char snakeChar = 's';
         public const char playerChar = '@';
+        public const char goalChar = 'G';
 
         public const int mapDisplacementX = 0;
         public const int mapDisplacementY = 2;
@@ -23,6 +24,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
         public const int maxConsoleMessageLenght = 120;
 
         public const double visionRange = 5;
+
+        public const int TurnsUntilClearingMessages = 3;
 
         public static bool IsVisible(Position p1, Position p2)
         {

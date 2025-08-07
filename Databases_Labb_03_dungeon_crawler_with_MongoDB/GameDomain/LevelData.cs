@@ -2,25 +2,42 @@
 // Om jag inte hade klickat i "Do not use top level statement" när jag skapade detta projekt, så hade jag inte behövt skriva namespace runt varje klass.
 using System.Runtime.InteropServices;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.States;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.Factories;
 
 namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
 {
 
     class LevelData
     {
-        //private List<LevelElement> elements;
-        private List<LevelElement> _elements = new List<LevelElement>();
+        //private List<LevelElement> _elements = new List<LevelElement>();
+        //public List<LevelElement> Elements
+        //{
+        //    get { return _elements; }
+        //    //set; // Denna property ska vara readonly.
+        //    set { _elements = value; }  // För databaskursen ska jag ha en set, vilket jag inte hade i grundkursen.
+        //}
 
-        public List<LevelElement> Elements
-        {
-            get { return _elements; }
-            //set; // Denna property ska vara readonly.
-        }
+        public List<LevelElement> Elements { get; set; } = new();
+
 
         //public Hero hero;
         public Hero Hero { get; set; }
 
-        public int TurnsUntilClearingMessages { get; set; }
+        public int TurnsUntilClearingMessages { get; set; } = GeneralDungeonFunctions.TurnsUntilClearingMessages;
+
+        // Nya properties för databaskursen.
+        
+        // Denna ska användas för att beräkna score.
+        public int TurnCount { get; set; }
+
+        public LevelData(LevelDataState state)
+        {
+            Hero = new Hero(state.Hero);
+            Elements = state.Elements
+                .Select(LevelElementFactory.FromState)
+                .ToList();
+        }
 
         public void Load(string fileName)
         {

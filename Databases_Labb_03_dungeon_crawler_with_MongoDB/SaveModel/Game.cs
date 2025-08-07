@@ -6,18 +6,26 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.States;
+
 namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.SaveModel
 {
     internal class Game
     {
         [BsonId]
-        public ObjectId Id { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
 
-        public string Username { get; set; } = string.Empty;
+        public string UserId { get; set; }
 
-        public string LevelName { get; set; } = string.Empty;
+        public string LevelId { get; set; }
 
-        public int TurnCount { get; set; }
-        public HeroState
+        public bool IsCompleted { get; set; }
+
+        public LevelDataState LevelData { get; set; } = new();
+
+
+        
     }
 }
