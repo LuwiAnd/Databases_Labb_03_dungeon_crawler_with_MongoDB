@@ -23,13 +23,17 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.SaveModel
 
         [BsonRepresentation(BsonType.ObjectId)]
         public string LevelId { get; set; }
+        public LevelDataState LevelDataState { get; set; } = new();
 
         //public bool IsCompleted { get; set; }
-        public GameStatus GameStatus { get; set; } = GameStatus.InProgress;
-
-        public LevelDataState LevelData { get; set; } = new();
+        public GameStatus GameStatus { get; set; } = GameStatus.Ongoing;
 
 
+        // Man kan använda DateTime.UtcNow istället, men detta ska
+        // bara köras lokalt, så jag väljer att använda lokal tid
+        // för att inte bli förvirrad om tiden inte stämmer med min
+        // dators klocka.
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         
     }
 }
