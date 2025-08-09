@@ -21,13 +21,15 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Implementa
 
         public async Task<string> SaveAsync(Game game)
         {
+            game.Id ??= ObjectId.GenerateNewId().ToString();
             await _collection.InsertOneAsync(game);
             return game.Id.ToString();
         }
 
         public async Task<Game?> GetByIdAsync(string id)
         {
-            var filter = Builders<Game>.Filter.Eq(g => g.Id, ObjectId.Parse(id));
+            //var filter = Builders<Game>.Filter.Eq(g => g.Id, ObjectId.Parse(id));
+            var filter = Builders<Game>.Filter.Eq(g => g.Id, id);
             return await _collection.Find(filter).FirstOrDefaultAsync();
         }
 
@@ -38,7 +40,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Implementa
 
         public async Task<bool> DeleteAsync(string id)
         {
-            var result = await _collection.DeleteOneAsync(g => g.Id == ObjectId.Parse(id));
+            //var result = await _collection.DeleteOneAsync(g => g.Id == ObjectId.Parse(id));
+            var result = await _collection.DeleteOneAsync(g => g.Id == id);
             return result.DeletedCount > 0;
         }
 

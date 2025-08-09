@@ -29,7 +29,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
             Position = p;
         }
 
-        public new string Type { get; set; }
+        // Kommenterar bort denna och använder basklassens Type, som jag borde gjort från början.
+        //public new string Type { get; set; }
         public double HP { get; set; }
 
         public Dice AttackDice = new Dice(numberOfDice: 2, sidesPerDice: 6, modifier: 2);
@@ -284,7 +285,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                     {
                         Enemy enemy = (Enemy)element;
                         Attack(levelData, enemy);
-                        if (enemy.HP > 0) { enemy.AttackHero(this); }
+                        //if (enemy.HP > 0) { enemy.AttackHero(this); }
+                        if (enemy.HP > 0) { enemy.AttackHero(this, levelData); }
                     }
                     else
                     {
@@ -313,10 +315,17 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
             if (enemyDamage < 0) { enemyDamage = 0; }
             enemy.HP -= enemyDamage;
 
+            var message = 
+                $"Player (HP: {HP}) throw dices: {AttackDice.ToString()} => {heroAttack}. " + 
+                $"{enemy.Type} (HP: {enemy.HP}) throw: {enemy.DefenceDice.ToString()} => {enemyDefence}. " + 
+                $"Damage = {enemyDamage}.";
+
             (int left, int top) = Console.GetCursorPosition();
             Console.SetCursorPosition(0, 0);
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Player (HP: {HP}) throw dices: {AttackDice.ToString()} => {heroAttack}. {enemy.Type} (HP: {enemy.HP}) throw: {enemy.DefenceDice.ToString()} => {enemyDefence}. Damage = {enemyDamage}.");
+            //Console.WriteLine($"Player (HP: {HP}) throw dices: {AttackDice.ToString()} => {heroAttack}. {enemy.Type} (HP: {enemy.HP}) throw: {enemy.DefenceDice.ToString()} => {enemyDefence}. Damage = {enemyDamage}.");
+            Console.WriteLine(message);
+            levelData.Log(message);
             Console.ForegroundColor = ConsoleColor.White;
             Console.SetCursorPosition(left, top);
 

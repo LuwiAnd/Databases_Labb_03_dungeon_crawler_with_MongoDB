@@ -80,7 +80,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
             adjacentPosition = GeneralDungeonFunctions.GetAdjacentPosition(Position, nextRelativePosition);
             if (adjacentPosition.X == hero.Position.X && adjacentPosition.Y == hero.Position.Y)
             {
-                AttackHero(hero);
+                //AttackHero(hero);
+                AttackHero(hero, levelData);
                 if (hero.HP > 0) { hero.Attack(levelData, this); }
                 return;
             }

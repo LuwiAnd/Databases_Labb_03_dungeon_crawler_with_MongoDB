@@ -12,6 +12,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.States
     {
         public List<LevelElementState> Elements { get; set; } = new();
         public HeroState Hero { get; set; } = new();
+        public List<string> Messages { get; set; }
         public int TurnCount { get; set; }
 
         public LevelDataState(LevelData levelData)
@@ -23,6 +24,9 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.States
                 //.Select(LevelElementStateFactory.CreateFrom)
                 .Select(LevelElementFactory.ToState)
                 .ToList();
+
+            //Messages = levelData.Messages; // Detta verkar göra att jag har två refernser till samma lista istället för att ha en kopia i objekt av denna klass.
+            Messages = new List<string>(levelData.Messages);
         }
 
         public LevelDataState()

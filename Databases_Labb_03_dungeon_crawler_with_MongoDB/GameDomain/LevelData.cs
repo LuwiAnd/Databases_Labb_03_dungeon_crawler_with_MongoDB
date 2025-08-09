@@ -27,9 +27,13 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
         public int TurnsUntilClearingMessages { get; set; } = GeneralDungeonFunctions.TurnsUntilClearingMessages;
 
         // Nya properties för databaskursen.
-        
+
+        public List<string> Messages { get; set; } = new();
+
         // Denna ska användas för att beräkna score.
         public int TurnCount { get; set; }
+
+        public LevelData() { }
 
         public LevelData(LevelDataState state)
         {
@@ -37,6 +41,10 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
             Elements = state.Elements
                 .Select(LevelElementFactory.FromState)
                 .ToList();
+
+            // Jag tror inte att en LevelDataState kan ha en Messages
+            // som är null, men det här är för säkerhets skull.
+            Messages = state.Messages?.ToList() ?? new();
         }
 
         public void Load(string fileName)
@@ -57,31 +65,22 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                             //currentPosition = new int[] { x, y };
                             if (line[x] == GeneralDungeonFunctions.wallChar)
                             {
-                                //le = new Wall({ x, y });
-                                //this._elements.Add(new Wall(new int[]{ x, y }));
-                                //this._elements.Add(new Wall(currentPosition));
-                                _elements.Add(new Wall(x, y));
-                                //Console.WriteLine($"A new wall was added");
+                                //_elements.Add(new Wall(x, y));
+                                Elements.Add(new Wall(x, y));
                             }
                             if (line[x] == GeneralDungeonFunctions.ratChar)
                             {
-                                //this._elements.Add(new Rat(new int[] { x, y }));
-                                _elements.Add(new Rat(x, y));
-                                //Console.WriteLine($"A new rat was added at position x = {x}, y = {y}.");
+                                //_elements.Add(new Rat(x, y));
+                                Elements.Add(new Rat(x, y));
                             }
                             if (line[x] == GeneralDungeonFunctions.snakeChar)
                             {
-                                //this._elements.Add(new Snake(new int[] { x, y }));
-                                _elements.Add(new Snake(x, y));
-                                //Console.WriteLine($"A new snake was added at position x = {x}, y = {y}.");
+                                Elements.Add(new Snake(x, y));
                             }
                             if (line[x] == GeneralDungeonFunctions.playerChar)
                             {
-                                //this.hero = new Hero(new int[] { x, y });
                                 //hero = new Hero(x, y);
                                 Hero = new Hero(x, y);
-
-                                //Console.WriteLine($"A new hero was added at position x = {x}, y = {y}.");
                             }
                         }
                         y++;
@@ -161,6 +160,13 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                     GeneralDungeonFunctions.Erase(enemy.Position.X, enemy.Position.Y);
                 }
             }
+        }
+
+        public void Log(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message)) return;
+
+            Messages.Add(message);
         }
     }
 }
