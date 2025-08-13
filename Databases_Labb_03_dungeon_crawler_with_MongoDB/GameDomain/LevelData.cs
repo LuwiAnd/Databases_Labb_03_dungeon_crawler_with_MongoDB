@@ -168,5 +168,38 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
 
             Messages.Add(message);
         }
+
+
+        // Hjälpfunktion.
+        public void LoadFromLayout(string layout)
+        {
+            if (string.IsNullOrEmpty(layout))
+                throw new ArgumentException("Layout är tom.", nameof(layout));
+
+            using var sr = new StringReader(layout);
+
+            Elements.Clear();
+            Hero = null;
+
+            string? line;
+            int y = 0;
+
+            while ((line = sr.ReadLine()) != null)
+            {
+                for (int x = 0; x < line.Length; x++)
+                {
+                    var ch = line[x];
+
+                    if (ch == GeneralDungeonFunctions.wallChar) Elements.Add(new Wall(x, y));
+                    else if (ch == GeneralDungeonFunctions.ratChar) Elements.Add(new Rat(x, y));
+                    else if (ch == GeneralDungeonFunctions.snakeChar) Elements.Add(new Snake(x, y));
+                    else if (ch == GeneralDungeonFunctions.playerChar) Hero = new Hero(x, y);
+                    else if (ch == GeneralDungeonFunctions.goalChar) Elements.Add(new Goal(x, y));
+                }
+                y++;
+            }
+
+            Hero?.Draw();
+        }
     }
 }

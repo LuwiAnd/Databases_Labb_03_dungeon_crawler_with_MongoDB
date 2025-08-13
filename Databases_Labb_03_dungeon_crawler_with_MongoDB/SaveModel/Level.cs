@@ -11,9 +11,15 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.SaveModel
     internal class Level
     {
         [BsonId]
-        public ObjectId Id { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
 
         [BsonElement("name")]
         public string Name { get; set; }
+
+        [BsonElement("layout")]
+        public string Layout { get; set; } = "";
+
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

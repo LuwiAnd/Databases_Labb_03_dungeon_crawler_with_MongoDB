@@ -8,13 +8,17 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.SaveModel
 {
+    // Id har typen string och inte ObjectId för att det ska gå att byta från MongoDB till SQL.
     internal class User
     {
         [BsonId]
-        public ObjectId Id { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; } = ObjectId.GenerateNewId().ToString();
 
         [BsonElement("name")]
-        public string? Name { get; set; }
+        public string? Name { get; set; } = "";
+
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public User()
         {
