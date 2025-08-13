@@ -18,6 +18,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Factories
             {
                  "hero" when state is  HeroState  heroState => new  Hero( heroState),
                  "wall" when state is  WallState  wallState => new  Wall( wallState),
+                 "goal" when state is  GoalState  goalState => new  Goal( goalState),
                   "rat" when state is   RatState   ratState => new   Rat(  ratState),
                 "snake" when state is SnakeState snakeState => new Snake(snakeState),
                 _ => throw new ArgumentException($"Unknown LevelElementState type: {state.Type}")
@@ -32,6 +33,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Factories
             {
                 "hero" => new HeroState((Hero)element),
                 "wall" => new WallState((Wall)element),
+                "goal" => new GoalState((Goal)element),
                 "rat" => new RatState((Rat)element),
                 "snake" => new SnakeState((Snake)element),
                 _ => throw new ArgumentException($"Unknown LevelElement type: {element.Type}")

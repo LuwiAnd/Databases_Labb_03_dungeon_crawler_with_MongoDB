@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.States;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.Factories;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.Types;
 
 namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
 {
@@ -22,7 +23,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
 
 
         //public Hero hero;
-        public Hero Hero { get; set; }
+        public Hero Hero { get; set; } //= new();
 
         public int TurnsUntilClearingMessages { get; set; } = GeneralDungeonFunctions.TurnsUntilClearingMessages;
 
@@ -32,6 +33,10 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
 
         // Denna ska användas för att beräkna score.
         public int TurnCount { get; set; }
+
+        public GameStatus GameStatus { get; set; } = GameStatus.Ongoing;
+        public int TotalDamageDealt { get; set; } = 0;
+        public int KillBonus { get; set; } = 0;
 
         public LevelData() { }
 
@@ -67,6 +72,11 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                             {
                                 //_elements.Add(new Wall(x, y));
                                 Elements.Add(new Wall(x, y));
+                            }
+                            if (line[x] == GeneralDungeonFunctions.goalChar)
+                            {
+                                //_elements.Add(new Wall(x, y));
+                                Elements.Add(new Goal(x, y));
                             }
                             if (line[x] == GeneralDungeonFunctions.ratChar)
                             {
@@ -105,6 +115,18 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                 {
                     Enemy enemy = (Enemy)element;
                     if (enemy.HP <= 0) { Elements.Remove(element); }
+                }
+            }
+        }
+
+        public void UpdateGoal()
+        {
+            foreach(LevelElement element in Elements)
+            {
+                if(element.Type == "goal")
+                {
+                    Goal goal = (Goal)element;
+                    goal.Update(Hero);
                 }
             }
         }
@@ -167,6 +189,13 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
             if (string.IsNullOrWhiteSpace(message)) return;
 
             Messages.Add(message);
+        }
+
+
+        public int ComputeScore()
+        {
+            int score = (int)Math.Round(Hero.HP) + TotalDamageDealt + KillBonus - TurnCount;
+            return Math.Max(0, score);
         }
 
 

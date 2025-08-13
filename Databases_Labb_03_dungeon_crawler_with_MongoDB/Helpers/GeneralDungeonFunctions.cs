@@ -18,6 +18,9 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
         public const char playerChar = '@';
         public const char goalChar = 'G';
 
+        // Jag borde gjort färger för alla LevelElement från början.
+        public const ConsoleColor goalColor = ConsoleColor.Yellow;
+
         public const int mapDisplacementX = 0;
         public const int mapDisplacementY = 2;
 

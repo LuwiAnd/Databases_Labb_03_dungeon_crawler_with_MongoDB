@@ -54,7 +54,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
             Position = state.Position;
             IsVisible = state.IsVisible;
 
-            Appearance = '#';
+            //Appearance = '#';
+            Appearance = GeneralDungeonFunctions.wallChar;
             Color = ConsoleColor.White;
             Type = "wall";
         }

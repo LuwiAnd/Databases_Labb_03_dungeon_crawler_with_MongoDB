@@ -252,6 +252,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                     }
                 }
             }
+
+            levelData.TurnCount++;
         }
 
         private bool HandleArrowKeys(string direction, LevelData levelData)
@@ -280,17 +282,39 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
             {
                 if (element.Position.X == positionToMoveTo.X && element.Position.Y == positionToMoveTo.Y)
                 {
-                    enemyInTheWay = true;
-                    if (element.Type != "wall")
+                    //enemyInTheWay = true;
+                    //if (element.Type != "wall")
+                    //{
+                    //    Enemy enemy = (Enemy)element;
+                    //    Attack(levelData, enemy);
+                    //    //if (enemy.HP > 0) { enemy.AttackHero(this); }
+                    //    if (enemy.HP > 0) { enemy.AttackHero(this, levelData); }
+                    //}
+                    //else
+                    //{
+                    //    okDirection = false;
+                    //}
+
+                    if(element.Type == "wall")
                     {
+                        okDirection = false;
+                        enemyInTheWay = false;
+                    }
+                    else if(element.Type == "goal")
+                    {
+                        okDirection = true;
+                        enemyInTheWay = false;
+
+                        levelData.GameStatus = GameStatus.Completed;
+                        levelData.Log($"Grattis, du vann genom att gå i mål!\n Poäng: {levelData.ComputeScore()}");
+                    }
+                    else
+                    {
+                        enemyInTheWay = true;
                         Enemy enemy = (Enemy)element;
                         Attack(levelData, enemy);
                         //if (enemy.HP > 0) { enemy.AttackHero(this); }
                         if (enemy.HP > 0) { enemy.AttackHero(this, levelData); }
-                    }
-                    else
-                    {
-                        okDirection = false;
                     }
                 }
 
@@ -314,6 +338,14 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
             int enemyDamage = heroAttack - enemyDefence;
             if (enemyDamage < 0) { enemyDamage = 0; }
             enemy.HP -= enemyDamage;
+
+            levelData.TotalDamageDealt += enemyDamage;
+
+            if(enemy.HP <= 0)
+            {
+                levelData.KillBonus += 10;
+            }
+
 
             var message = 
                 $"Player (HP: {HP}) throw dices: {AttackDice.ToString()} => {heroAttack}. " + 
