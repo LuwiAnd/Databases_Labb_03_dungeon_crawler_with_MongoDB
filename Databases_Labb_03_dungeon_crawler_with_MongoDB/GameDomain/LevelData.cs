@@ -230,5 +230,22 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
 
             Hero?.Draw();
         }
+
+
+        public void RenderInitialFrame(bool drawAllElements = false)
+        {
+            Console.Clear();
+
+            foreach (var e in Elements)
+            {
+                if (drawAllElements || e.IsVisible || GeneralDungeonFunctions.IsVisible(Hero.Position, e.Position))
+                {
+                    e.Draw();
+                }
+            }
+
+            Hero?.Draw();
+        }
+
     }
 }

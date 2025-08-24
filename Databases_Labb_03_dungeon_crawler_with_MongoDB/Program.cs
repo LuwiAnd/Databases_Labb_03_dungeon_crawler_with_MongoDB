@@ -204,6 +204,7 @@ namespace Labb_02_dungeon_crawler
                     }
                 }
 
+                currentLevelData.RenderInitialFrame();
                 await GameLoop.PlayGameAsync(
                     currentLevelData,
                     async ld =>
