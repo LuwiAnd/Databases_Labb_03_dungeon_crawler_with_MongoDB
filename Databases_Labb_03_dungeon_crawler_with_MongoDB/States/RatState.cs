@@ -6,18 +6,21 @@ using System.Threading.Tasks;
 
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.Types;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.States
 {
+    [BsonDiscriminator]
     internal class RatState : EnemyState
     {
         //public Position Position { get; set; } = new Position();
-        public double HP { get; set; }
+        //public double HP { get; set; } // Denna ska bara finnas i EnemyState för att inte orsaka en krock.
 
         public RatState() { }
 
         public RatState(Rat rat)
         {
+            Type = "rat";
             Position = rat.Position;
             HP = rat.HP;
         }
