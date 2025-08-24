@@ -11,6 +11,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Interfaces
 {
     internal interface ILevelRepository
     {
+        public Task<bool> HasElements();
         public Task<string> CreateLevelAsync(Level level);
         public Task<Level?> GetByIdAsync(string id);
         public Task<List<Level>> GetByNameAsync(string name);
@@ -18,5 +19,6 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Interfaces
         public Task<SaveResult> UpdateAsync(Level level);
         public Task<int> DeleteAsync(string id);
         public Task<bool> ExistsByNameAsync(string name);
+        Task ImportLevelsFromFolderAsync();
     }
 }

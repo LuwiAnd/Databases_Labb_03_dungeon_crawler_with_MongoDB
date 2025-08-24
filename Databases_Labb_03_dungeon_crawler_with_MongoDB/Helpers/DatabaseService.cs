@@ -1,4 +1,6 @@
-﻿using Databases_Labb_03_dungeon_crawler_with_MongoDB.SaveModel;
+﻿using Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Interfaces;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.SaveModel;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.Types;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -6,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
@@ -55,6 +58,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
             }
         }
 
+        // Den här versionen ska jag inte använda längre, eftersom jag använder repository pattern.
         public static void CreateUser(IMongoCollection<User> users)
         {
             Console.Clear();
@@ -82,19 +86,212 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                 }
                 else
                 {
-                    Console.WriteLine($"Username \"{username}\" was either not 1 - 10 characters or ");
+                    Console.WriteLine($"Username \"{username}\" was either not 1 - 10 characters or missing.");
                 }
             }
 
         }
 
 
-        //public static User LoadUser(IMongoCollection<User> users)
-        public static int? LoadUser(IMongoCollection<User> users)
+        public static async Task<User> CreateUserAsync(IUserRepository users)
         {
             Console.Clear();
 
-            var allUsers = users.Find<User>(FilterDefinition<User>.Empty).ToList();
+            var usernames = (await users.GetAllAsync())
+                .Where(u => !string.IsNullOrWhiteSpace(u.Name))
+                .Select(u => u.Name)
+                .ToList();
+
+            User createdUser;
+            while (true)
+            {
+                Console.WriteLine("Ange ett användarnamn (1–10 tecken, endast a–ö/A–Ö/0–9):");
+                string? username = Console.ReadLine();
+
+
+                if (string.IsNullOrWhiteSpace(username))
+                {
+                    Console.WriteLine("Användarnamnet får inte vara tomt.");
+                    continue;
+                }
+
+                username = username.Trim();
+
+                var valid = Regex.IsMatch(username, @"^[0-9A-Za-zÅÄÖåäö]{1,10}$");
+                if (!valid)
+                {
+                    Console.WriteLine("Ogiltigt namn. Tillåtna tecken: a–ö, A–Ö och 0–9. Max 10 tecken.");
+                    continue;
+                }
+
+                if (usernames.Contains(username))
+                {
+                    Console.WriteLine($"Username \"{username}\" already exists.");
+                    continue;
+                }
+
+
+                if (await users.ExistsByNameAsync(username))
+                {
+                    Console.WriteLine($"Användarnamnet \"{username}\" finns redan.");
+                    continue;
+                }
+
+
+                createdUser = await users.CreateUserAsync(new User { Name = username });
+                Console.WriteLine($"Användare \"{username}\" skapades!");
+                break;
+            }
+
+            return createdUser;
+        }
+
+
+        //public static User LoadUser(IMongoCollection<User> users)
+        //public static int? LoadUser(IMongoCollection<User> users)
+        //{
+        //    Console.Clear();
+
+        //    var allUsers = users.Find<User>(FilterDefinition<User>.Empty).ToList();
+        //    var usernames = allUsers.Select(u => u.Name).ToList();
+
+        //    List<string?> options = usernames;
+
+        //    string search = "";
+        //    int selected = 0;
+        //    int numberOfOptions = usernames.Count;
+
+
+        //    if(numberOfOptions == 0)
+        //    {
+        //        Console.WriteLine("There are no users in the database to load.");
+        //        Console.WriteLine("Press any key to continue");
+        //        Console.ReadLine();
+        //        return null;
+        //    }
+
+
+        //    void DrawDeselect(int option)
+        //    {
+        //        Console.BackgroundColor = ConsoleColor.Black;
+        //        Console.SetCursorPosition(0, option);
+        //        Console.Write(options[option]);
+        //    }
+
+        //    void DrawSelect(int option)
+        //    {
+        //        Console.BackgroundColor = ConsoleColor.DarkGray;
+        //        Console.SetCursorPosition(0, option);
+        //        Console.Write(options[option]);
+        //    }
+
+        //    void DrawBigList()
+        //    {
+        //        Console.Clear();
+
+        //        Console.BackgroundColor = ConsoleColor.Black;
+        //        Console.WriteLine($"{((selected - 2 + numberOfOptions) % numberOfOptions)}. {options[((selected - 2 + numberOfOptions) % numberOfOptions)]}");
+        //        Console.WriteLine($"{((selected - 1 + numberOfOptions) % numberOfOptions)}. {options[((selected - 1 + numberOfOptions) % numberOfOptions)]}");
+        //        Console.BackgroundColor = ConsoleColor.DarkGray;
+        //        Console.Write($"{selected}. {options[selected]}");
+        //        Console.BackgroundColor = ConsoleColor.Black;
+        //        Console.WriteLine("");
+        //        Console.WriteLine($"{((selected + 1 + numberOfOptions) % numberOfOptions)}. {options[((selected + 1 + numberOfOptions) % numberOfOptions)]}");
+        //        Console.WriteLine($"{((selected + 2 + numberOfOptions) % numberOfOptions)}. {options[((selected + 2 + numberOfOptions) % numberOfOptions)]}");
+        //    }
+
+        //    Console.WriteLine("Choose a user by using the up and down arrow keys.");
+        //    Console.WriteLine("Start typing a username to filter the list.");
+        //    Console.WriteLine("Press Enter key to select highlighted user.");
+        //    Console.WriteLine("Press escape to exit without loading a user.");
+        //    Console.WriteLine();
+
+        //    var (left, top) = Console.GetCursorPosition();
+
+        //    ConsoleKeyInfo cki;
+        //    int intervalTime = 50;
+
+        //    MenuViewer.View(row: top, options: options, selected: 0);
+
+        //    while (true)
+        //    {
+        //        while (Console.KeyAvailable == false)
+        //        {
+        //            Thread.Sleep(intervalTime);
+        //        }
+
+        //        if (Console.KeyAvailable)
+        //        {
+        //            cki = Console.ReadKey();
+
+
+
+        //            //if (numberOfOptions <= 5)
+        //            if (false)
+        //            {
+        //                if (cki.Key == ConsoleKey.UpArrow)
+        //                {
+        //                    DrawDeselect(selected);
+        //                    selected--;
+        //                    selected = (selected + numberOfOptions) % numberOfOptions;
+        //                    DrawSelect(selected);
+        //                }
+        //                else if (cki.Key == ConsoleKey.DownArrow)
+        //                {
+        //                    DrawDeselect(selected);
+        //                    selected++;
+        //                    selected = selected % numberOfOptions;
+        //                    DrawSelect(selected);
+        //                }
+        //                else if (cki.Key == ConsoleKey.Enter)
+        //                {
+        //                    Console.BackgroundColor = ConsoleColor.Black;
+        //                    Console.Clear();
+        //                    return selected;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                if (cki.Key == ConsoleKey.UpArrow)
+        //                {
+        //                    selected--;
+        //                    selected = (selected + numberOfOptions) % numberOfOptions;
+        //                    //DrawBigList();
+        //                    MenuViewer.View(row: top, options: options, selected: selected);
+        //                }
+        //                else if (cki.Key == ConsoleKey.DownArrow)
+        //                {
+        //                    selected++;
+        //                    selected = selected % numberOfOptions;
+        //                    //DrawBigList();
+        //                    MenuViewer.View(row: top, options: options, selected: selected);
+        //                }
+        //                else if (cki.Key == ConsoleKey.Enter)
+        //                {
+        //                    Console.BackgroundColor = ConsoleColor.Black;
+        //                    Console.Clear();
+        //                    return selected;
+        //                }else if(cki.Key == ConsoleKey.Escape)
+        //                {
+        //                    Console.BackgroundColor = ConsoleColor.Black;
+        //                    Console.Clear();
+        //                    return null;
+        //                }
+        //            }
+
+        //        }
+        //    }
+
+        //    //return new User { Name = "test" };
+        //    return 5; // Jag ska returnera en användare när jag är klar med denna funktion.
+        //}
+
+        public static async Task<User?> LoadUserAsync(IUserRepository users)
+        {
+
+            Console.Clear();
+
+            var allUsers = await users.GetAllAsync();
             var usernames = allUsers.Select(u => u.Name).ToList();
 
             List<string?> options = usernames;
@@ -104,7 +301,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
             int numberOfOptions = usernames.Count;
 
 
-            if(numberOfOptions == 0)
+            if (numberOfOptions == 0)
             {
                 Console.WriteLine("There are no users in the database to load.");
                 Console.WriteLine("Press any key to continue");
@@ -189,7 +386,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                         {
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Clear();
-                            return selected;
+                            //return selected;
+                            return allUsers[selected];
                         }
                     }
                     else
@@ -212,8 +410,10 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                         {
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Clear();
-                            return selected;
-                        }else if(cki.Key == ConsoleKey.Escape)
+                            //return selected;
+                            return allUsers[selected];
+                        }
+                        else if (cki.Key == ConsoleKey.Escape)
                         {
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Clear();
@@ -224,20 +424,48 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                 }
             }
 
-            //return new User { Name = "test" };
-            return 5; // Jag ska returnera en användare när jag är klar med denna funktion.
+            //return null;
         }
 
-        public string? LoadLevel(IMongoCollection<Level> levels)
-        {
-            Console.Clear();
+        //public string? LoadLevel(IMongoCollection<Level> levels)
+        //{
+        //    Console.Clear();
 
-            var allLevels = levels.Find<Level>(FilterDefinition<Level>.Empty).ToList();
+        //    var allLevels = levels.Find<Level>(FilterDefinition<Level>.Empty).ToList();
+        //    var levelNames = allLevels.Select(l => l.Name).ToList();
+
+        //    List<string?> options = levelNames;
+
+        //    MenuViewer.View()
+        //}
+
+        public static async Task<Level> LoadLevelAsync(ILevelRepository levels)
+        {
+            var allLevels = (await levels.GetAllAsync()).ToList();
             var levelNames = allLevels.Select(l => l.Name).ToList();
 
-            List<string?> options = levelNames;
+            int? selected = null;
+            while(selected == null)
+            {
+                selected = MenuViewer.View(options: levelNames);
+            }
 
-            MenuViewer.View()
+            Console.WriteLine($"Du valde bana: {levelNames[selected.Value]}");
+
+            return allLevels[selected.Value];
+        }
+
+        public static async Task<Game?> LoadGameAsync(IGameRepository games, User? user)
+        {
+            if (user is null) throw new ArgumentNullException(nameof(user));
+
+            var allGames = await games.GetAllAsync();
+            var game = allGames
+                .Where(g => g.UserId == user.Id && g.GameStatus == GameStatus.Ongoing)
+                .OrderByDescending(g => g.CreatedAt)
+                .FirstOrDefault();
+
+            return game;
         }
     }
 }

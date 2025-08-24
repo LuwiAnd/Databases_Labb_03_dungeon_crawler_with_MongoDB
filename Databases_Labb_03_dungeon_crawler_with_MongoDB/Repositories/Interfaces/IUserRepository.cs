@@ -11,7 +11,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Interfaces
 {
     internal interface IUserRepository
     {
-        public Task CreateUserAsync(User user);
+        public Task<bool> HasElements();
+        public Task<User> CreateUserAsync(User user);
         public Task<User?> GetByIdAsync(string id);
         public Task<List<User>> GetByNameAsync(string name);
         public Task<List<User>> GetAllAsync();

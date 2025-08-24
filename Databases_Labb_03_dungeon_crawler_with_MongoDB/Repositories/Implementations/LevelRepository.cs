@@ -25,6 +25,11 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Implementa
             _levels = db.GetCollection<Level>("levels");
         }
 
+        public async Task<bool> HasElements()
+        {
+            return await _levels.CountDocumentsAsync(FilterDefinition<Level>.Empty) > 0;
+        }
+
         public async Task<string> CreateLevelAsync(Level level)
         {
             if (level is null) throw new ArgumentNullException(nameof(level));
@@ -145,11 +150,12 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Implementa
             if (!Directory.Exists(levelsFolder))
                 throw new DirectoryNotFoundException($"Hittar inte Levels-mappen: {levelsFolder}");
 
+            int importedCount = 0;
             foreach (var file in Directory.EnumerateFiles(levelsFolder, "*.txt", SearchOption.TopDirectoryOnly))
             {
+                
                 var name = Path.GetFileNameWithoutExtension(file);
 
-                // hoppa över om den redan finns (case-insensitive exakt match)
                 if (await ExistsByNameAsync(name))
                     continue;
 
@@ -160,7 +166,15 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Implementa
                     Name = name,
                     Layout = layout
                 });
+
+                importedCount++;
             }
+
+            if (importedCount == 0) Console.WriteLine($"Mappen {levelsFolder} innehöll inga txt-filer med banor som inte redan importerats.");
+
+            if (!await HasElements())
+                throw new Exception("Efter import finns det inga banor i databasen. Kontrollera att Levels-mappen innehåller giltiga .txt-filer.");
+
         }
 
 

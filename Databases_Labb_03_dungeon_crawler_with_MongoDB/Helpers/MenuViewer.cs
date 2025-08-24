@@ -88,6 +88,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                 {
                     cki = Console.ReadKey();
 
+                    if (cki.Key == ConsoleKey.Escape) return null;
+
                     if(numberOfOptions <= 5)
                     {
                         if (cki.Key == ConsoleKey.UpArrow)

@@ -20,6 +20,18 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Implementa
             _collection = db.GetCollection<Game>("games");
         }
 
+        public async Task<bool> HasElements(User user, Level level)
+        {
+            // Detta fungerade inte, för det går inte att använda tupler i Filter.Eq.
+            //var filter = Builders<Game>.Filter.Eq(game => (game.UserId, game.LevelId), (user.Id, level.Id));
+
+            var filter = Builders<Game>.Filter.And(
+                Builders<Game>.Filter.Eq(game => game.UserId, user.Id),
+                Builders<Game>.Filter.Eq(game => game.LevelId, level.Id)
+            );
+            return await _collection.CountDocumentsAsync(filter) > 0;
+        }
+
         public async Task CreateAsync(Game game)
         {
             game.Id ??= ObjectId.GenerateNewId().ToString();

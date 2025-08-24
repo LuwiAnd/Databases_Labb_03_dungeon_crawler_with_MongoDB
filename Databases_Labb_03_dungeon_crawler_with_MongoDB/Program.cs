@@ -1,8 +1,10 @@
 ﻿
 // Om jag inte hade klickat i "Do not use top level statement" när jag skapade detta projekt, så hade jag inte behövt skriva namespace runt varje klass.
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain;
-using Databases_Labb_03_dungeon_crawler_with_MongoDB.GameObjects;
+//using Databases_Labb_03_dungeon_crawler_with_MongoDB.GameObjects;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Implementations;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Interfaces;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.SaveModel;
 using MongoDB.Driver;
 using System.Reflection.Metadata;
@@ -12,7 +14,7 @@ namespace Labb_02_dungeon_crawler
 {
     internal class Program
     {
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
             
 
@@ -53,161 +55,187 @@ namespace Labb_02_dungeon_crawler
             //var dbClient = new MongoClient("localhost:27017");
             var dbClient = new MongoClient("mongodb://localhost:27017");
             string dbName = "LudwigAndersson";
-
             var db = dbClient.GetDatabase(dbName);
 
-            //(IMongoCollection<User> users, IMongoCollection<Level> levels, IMongoCollection<Game> games) = DatabaseService.InitializeDatabase(db);
-            var (users, levels, games) = DatabaseService.InitializeDatabase(db);
+            IUserRepository userRepo = new UserRepository(db);
+            ILevelRepository levelRepo = new LevelRepository(db);
+            IGameRepository gameRepo = new GameRepository(db);
 
-            //bool userCollectionExists = db.ListCollectionNames().ToList().Contains("users");
-            //bool levelCollectionExists = db.ListCollectionNames().ToList().Contains("levels");
-            //bool gameCollectionExists = db.ListCollectionNames().ToList().Contains("games");
+            ////(IMongoCollection<User> users, IMongoCollection<Level> levels, IMongoCollection<Game> games) = DatabaseService.InitializeDatabase(db);
+            //var (users, levels, games) = DatabaseService.InitializeDatabase(db);
 
-            bool userCollectionHasData  = db.GetCollection< User>( "users").Find(FilterDefinition< User>.Empty).Any();
-            bool levelCollectionHasData = db.GetCollection<Level>("levels").Find(FilterDefinition<Level>.Empty).Any();
-            bool gameCollectionHasData  = db.GetCollection< Game>( "games").Find(FilterDefinition< Game>.Empty).Any();
+            //string levelsFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Levels");
+            await levelRepo.ImportLevelsFromFolderAsync();
 
-            //bool levelCollectionHasData = db.ListCollectionNames().ToList().Contains("levels");
+            //string? username;
+            //string? level;
 
+            User? selectedUser = null;
+            Level? selectedLevel = null;
+            Game? selectedGame = null;
+            LevelData? currentLevelData = null;
 
-            string? username;
-            string? level;
-            if (!userCollectionHasData)
+            // Loop för hela mitt program som kommer att köras tills programmet avslutas.
+            while (true)
             {
-                while (true)
+                selectedUser = null;
+                selectedLevel = null;
+                selectedGame = null;
+                currentLevelData = null;
+
+                Console.Clear();
+                Console.WriteLine("Dungeon Crawler (MongoDB) — Huvudmeny");
+                Console.WriteLine("--------------------------------------");
+                Console.WriteLine();
+
+                ////bool userCollectionExists = db.ListCollectionNames().ToList().Contains("users");
+                ////bool levelCollectionExists = db.ListCollectionNames().ToList().Contains("levels");
+                ////bool gameCollectionExists = db.ListCollectionNames().ToList().Contains("games");
+
+                //bool userCollectionHasData  = db.GetCollection< User>( "users").Find(FilterDefinition< User>.Empty).Any();
+                //bool levelCollectionHasData = db.GetCollection<Level>("levels").Find(FilterDefinition<Level>.Empty).Any();
+                //bool gameCollectionHasData  = db.GetCollection< Game>( "games").Find(FilterDefinition< Game>.Empty).Any();
+
+                ////bool levelCollectionHasData = db.ListCollectionNames().ToList().Contains("levels");
+
+                bool userCollectionHasData = await userRepo.HasElements();
+                if (userCollectionHasData)
                 {
-                    Console.WriteLine("Enter your username, max 10 characters:");
-                    username = Console.ReadLine();
-
-                    if(username != null && username?.Length <= 10)
+                    int? optionTmp = null;
+                    List<string> userNewOldOptions = new List<string>
                     {
-                        User currentUser = new User { Name = username };
+                        "Skapa en ny användare.",
+                        "Välj en befintlig användare."
+                    };
+                    while (optionTmp == null)
+                    {
+                        Console.WriteLine("Vill du skapa en ny användare eller välja en befintlig?");
+                        optionTmp = MenuViewer.View(userNewOldOptions);
+                    }
+                    
 
-                        //users.InsertOne(currentUser);
+                    Console.WriteLine("Du valde:");
+                    Console.WriteLine(userNewOldOptions[optionTmp.Value]);
 
-                        //try
-                        //{
-                        //    users.InsertOne(currentUser);
-                        //    Console.WriteLine($"User inserted with ID: {currentUser.Id}");
-                        //}
-                        //catch (Exception ex)
-                        //{
-                        //    Console.WriteLine("Fel vid insert:");
-                        //    Console.WriteLine(ex.Message);
-                        //}
-                        DatabaseService.SaveToDb(users, currentUser);
-
-
-                        break;
+                    if(optionTmp.Value == 0)
+                    {
+                        //Console.WriteLine("Skriv in ditt användarnamn (högst 10 tecken)");
+                        selectedUser = await DatabaseService.CreateUserAsync(userRepo);
                     }
                     else
                     {
-                        Console.Clear();
+                        selectedUser = await DatabaseService.LoadUserAsync(userRepo);
                     }
                 }
-            }
-
-            string levelsFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Levels");
-            if (!levelCollectionHasData)
-            {
-                if (Directory.Exists(levelsFolder))
+                else
                 {
-                    var txtFiles = Directory.GetFiles(levelsFolder, "*.txt");
+                    selectedUser = await DatabaseService.CreateUserAsync(userRepo);
+                }
 
-                    foreach(var filePath in txtFiles)
+                //// Jag behöver inte kolla att det finns levels här, för det kollar jag när
+                //// jag anropar ImportLevelsFromFolderAsync.
+                //bool levelCollectionHasData = await levelRepo.HasElements();
+                //if (!levelCollectionHasData)
+                //{
+                //}
+
+                //while (selectedLevel == null)
+                while (currentLevelData == null)
+                {
+                    Console.WriteLine("Vad vill du göra nu?");
+                    List<string> tmpOptions = new List<string>
                     {
-                        var levelData = new LevelData();
-                        levelData.Load(filePath);
-                        levelData.TurnsUntilClearingMessages = 3;
+                        "Starta ett nytt spel.",
+                        "Ladda ditt pågående spel (om det inte finns startas ett nytt spel)"
+                    };
 
-                        Level tmpLevel = new Level
+                    var tmpSelected = MenuViewer.View(tmpOptions);
+                    if (!tmpSelected.HasValue) continue;
+
+                    //switch (tmpSelected)
+                    //{
+                    //    case 0:
+                    //        Console.WriteLine("Du valde att starta ett nytt spel.");
+                    //        selectedLevel = await DatabaseService.LoadLevelAsync(levelRepo);
+                    //        break;
+                    //    case 1:
+                    //        Console.WriteLine("Du valde att ladda ett pågående spel.");
+                    //        selectedGame = await DatabaseService.LoadGameAsync(gameRepo, selectedUser);
+                    //        break;
+                    //    default:
+                    //        Console.WriteLine("Något gick fel. Du valde ett alternativ som inte finns.");
+                    //        break;
+                    //}
+
+                    if (tmpSelected.Value == 0)
+                    {
+                        selectedLevel = await DatabaseService.LoadLevelAsync(levelRepo); // bör returnera Level?
+                        if (selectedLevel == null)
                         {
-                            Name = Path.GetFileNameWithoutExtension(filePath)
-                        };
+                            Console.WriteLine("Ingen level vald.");
+                            continue;
+                        }
 
-                        levels.InsertOne(tmpLevel);
+                        currentLevelData = new LevelData();
+                        currentLevelData.LoadFromLayout(selectedLevel.Layout);
+
+                        selectedGame = await GameCreationHelper.CreateAndSaveNewGameAsync(
+                            gameRepository: gameRepo,
+                            userId: selectedUser!.Id,
+                            levelId: selectedLevel.Id,
+                            levelDataState: new Databases_Labb_03_dungeon_crawler_with_MongoDB.States.LevelDataState(currentLevelData)
+                        );
+                    }
+                    else if (tmpSelected.Value == 1)
+                    {
+                        selectedGame = await DatabaseService.LoadGameAsync(gameRepo, selectedUser!);
+
+                        if (selectedGame == null)
+                        {
+                            Console.WriteLine("Inget pågående spel hittades. Startar nytt i stället.");
+                            continue;
+                        }
+
+                        currentLevelData = new LevelData(selectedGame.LevelDataState);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Ogiltigt val.");
                     }
                 }
-            }
 
+                await GameLoop.PlayGameAsync(
+                    currentLevelData,
+                    async ld =>
+                    {
+                        selectedGame!.LevelDataState = new Databases_Labb_03_dungeon_crawler_with_MongoDB.States.LevelDataState(ld);
+                        selectedGame.GameStatus = ld.GameStatus;
+                        
+                        await gameRepo.UpdateAsync(selectedGame);
+                    }
+                );
 
-            while (true)
-            {
-                Console.WriteLine("What do you want to do now?");
-                List<string> tmpOptions = new List<string>
-                {
-                    "Start a new game.",
-                    "Create a new user.",
-                    "Load a user.",
-                };
-
-                var tmpSelected = MenuViewer.View(tmpOptions);
-
-                switch (tmpSelected)
-                {
-                    case 0:
-                        Console.WriteLine("You choose to create a new game.");
-                        DatabaseService.LoadLevels();
-                        break;
-                    case 1:
-                        Console.WriteLine("You choose to create a new user.");
-                        DatabaseService.CreateUser(users);
-                        break;
-                    case 2:
-                        Console.WriteLine("You choose to load an existing user.");
-                        DatabaseService.LoadUser(users);
-                        Console.ReadLine();
-                        break;
-                    default:
-                        Console.WriteLine("Something went wrong. Your selected option is not supported.");
-                        break;
-                }
+                Console.SetCursorPosition(0, 3);
+                Console.WriteLine($"Status: {currentLevelData.GameStatus}");
+                Console.WriteLine($"Poäng:  {currentLevelData.ComputeScore()}");
+                Console.WriteLine();
+                Console.WriteLine("Tryck valfri tangent för att återgå till menyn...");
+                Console.ReadKey(true);
 
             }
-            
 
 
-            Console.WriteLine("Player: Luwi");
-            Console.WriteLine("Enemy: ????");
+
+            //Console.WriteLine("Player: Luwi");
+            //Console.WriteLine("Enemy: ????");
 
             //LevelData levelData = new LevelData();
             //levelData.Load("C:\\Users\\ludwi\\source\\repos\\Labb_02_dungeon_crawler\\LevelElement\\bin\\Debug\\net8.0\\Level1.txt");
             //levelData.TurnsUntilClearingMessages = 3;
 
-            bool gameOver = false;
-            while (!gameOver)
-            {
-                if (levelData.TurnsUntilClearingMessages > 0) levelData.TurnsUntilClearingMessages--;
-                else GeneralDungeonFunctions.ClearConsoleMessages();
-
-                //levelData.hero.Update(levelData.Elements);
-                levelData.Hero.Update(levelData);
-                if (CheckIsHeroDead(levelData.Hero)) break;
-
-                levelData.UpdateWalls();
-                levelData.UpdateSnakes();
-                if (CheckIsHeroDead(levelData.Hero)) break;
-                levelData.UpdateRats();
-                if (CheckIsHeroDead(levelData.Hero)) break;
-
-                levelData.hero.Draw();
-                levelData.EraseDeadElements();
-                levelData.RemoveElements();
-            }
+            
         }
 
-        private static bool CheckIsHeroDead(Hero hero)
-        {
-            if (hero.HP <= 0)
-            {
-                Console.SetCursorPosition(10, 22);
-                Console.ForegroundColor = ConsoleColor.Magenta;
-                Console.WriteLine("You died! Game over!");
-                Console.ForegroundColor = ConsoleColor.White;
-                //break;
-                return true;
-            }
-            return false;
-        }
+        
     }
 }

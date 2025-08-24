@@ -11,6 +11,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Interfaces
 {
     internal interface IGameRepository
     {
+        public Task<bool> HasElements(User user, Level level);
         Task CreateAsync(Game game);
         //Task<string> SaveAsync(Game game);
         Task<Game?> GetByIdAsync(string id);

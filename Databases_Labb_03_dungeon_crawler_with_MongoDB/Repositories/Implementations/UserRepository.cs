@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -27,7 +28,19 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Implementa
             _users = db.GetCollection<User>("users");
         }
 
-        public async Task CreateUserAsync(User user)
+        public async Task<bool> HasElements()
+        {
+            //var users = await _users
+            //    .Find<User>(FilterDefinition<User>.Empty)
+            //    .ToListAsync();
+            //
+            //return users.Count > 0;
+
+            // Detta gör samma sak som ovanstående, fast utan att hämta hela listan och sen räkna:
+            return await _users.CountDocumentsAsync(FilterDefinition<User>.Empty) > 0;
+        }
+
+        public async Task<User> CreateUserAsync(User user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             if (string.IsNullOrWhiteSpace(user.Name))
@@ -37,6 +50,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Implementa
 
             user.Id ??= ObjectId.GenerateNewId().ToString();
             await _users.InsertOneAsync(user);
+
+            return user;
         }
 
         public async Task<User?> GetByIdAsync(string id)
