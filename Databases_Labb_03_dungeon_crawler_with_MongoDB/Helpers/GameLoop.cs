@@ -23,8 +23,10 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
             saveGameStateAsync ??= (_ => Task.CompletedTask);
 
             Console.SetCursorPosition(0, 0);
+            Console.WriteLine("Använd piltangenterna för att spela och L för att se händelsehistoriken.");
             Console.WriteLine(""); // rad för spelarens attack
             Console.WriteLine(""); // rad för fiendens attack
+
 
             bool gameOver = false;
             while (!gameOver)

@@ -108,7 +108,15 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                     //enemyInTheWay = false;
                     //enemyMovedAway = false;
 
-                    if (cki.Key == ConsoleKey.UpArrow)
+                    if (cki.Key == ConsoleKey.L)
+                    {
+                        LogViewer.Show(levelData.Messages);
+
+                        levelData.RenderInitialFrame();
+                        okDirection = false;
+                        continue;
+                    }
+                    else if (cki.Key == ConsoleKey.UpArrow)
                     {
                         /*
                         //okDirection = true;
@@ -247,8 +255,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                     }
                     else
                     {
-                        // The user stands still.
-                        okDirection = true;
+                        okDirection = false;
                     }
                 }
             }
@@ -306,6 +313,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                         enemyInTheWay = false;
 
                         levelData.GameStatus = GameStatus.Completed;
+
+                        Console.Clear();
                         levelData.Log($"Grattis, du vann genom att gå i mål!\n Poäng: {levelData.ComputeScore()}");
                     }
                     else

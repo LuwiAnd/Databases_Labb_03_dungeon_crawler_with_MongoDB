@@ -8,6 +8,7 @@ using Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Interfaces;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.SaveModel;
 using MongoDB.Driver;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 
 namespace Labb_02_dungeon_crawler
@@ -167,24 +168,33 @@ namespace Labb_02_dungeon_crawler
                     //        break;
                     //}
 
+
+                    
+
                     if (tmpSelected.Value == 0)
                     {
-                        selectedLevel = await DatabaseService.LoadLevelAsync(levelRepo); // bör returnera Level?
-                        if (selectedLevel == null)
-                        {
-                            Console.WriteLine("Ingen level vald.");
-                            continue;
-                        }
+                        //selectedLevel = await DatabaseService.LoadLevelAsync(levelRepo);
+                        //if (selectedLevel == null)
+                        //{
+                        //    Console.WriteLine("Ingen level vald.");
+                        //    continue;
+                        //}
 
-                        currentLevelData = new LevelData();
-                        currentLevelData.LoadFromLayout(selectedLevel.Layout);
+                        //currentLevelData = new LevelData();
+                        //currentLevelData.LoadFromLayout(selectedLevel.Layout);
 
-                        selectedGame = await GameCreationHelper.CreateAndSaveNewGameAsync(
-                            gameRepository: gameRepo,
-                            userId: selectedUser!.Id,
-                            levelId: selectedLevel.Id,
-                            levelDataState: new Databases_Labb_03_dungeon_crawler_with_MongoDB.States.LevelDataState(currentLevelData)
-                        );
+                        //selectedGame = await GameCreationHelper.CreateAndSaveNewGameAsync(
+                        //    gameRepository: gameRepo,
+                        //    userId: selectedUser!.Id,
+                        //    levelId: selectedLevel.Id,
+                        //    levelDataState: new Databases_Labb_03_dungeon_crawler_with_MongoDB.States.LevelDataState(currentLevelData)
+                        //);
+
+                        var result = await GameCreationHelper.StartNewGameAsync(levelRepo, gameRepo, selectedUser!);
+                        selectedGame = result.Game;
+                        currentLevelData = result.LevelData;
+
+                        if (selectedGame == null || currentLevelData == null) continue;
                     }
                     else if (tmpSelected.Value == 1)
                     {
@@ -193,7 +203,11 @@ namespace Labb_02_dungeon_crawler
                         if (selectedGame == null)
                         {
                             Console.WriteLine("Inget pågående spel hittades. Startar nytt i stället.");
-                            continue;
+                            var result = await GameCreationHelper.StartNewGameAsync(levelRepo, gameRepo, selectedUser!);
+                            selectedGame = result.Game;
+                            currentLevelData = result.LevelData;
+
+                            if (selectedGame == null || currentLevelData == null) continue;
                         }
 
                         currentLevelData = new LevelData(selectedGame.LevelDataState);
@@ -216,6 +230,7 @@ namespace Labb_02_dungeon_crawler
                     }
                 );
 
+                Console.Clear();
                 Console.SetCursorPosition(0, 3);
                 Console.WriteLine($"Status: {currentLevelData.GameStatus}");
                 Console.WriteLine($"Poäng:  {currentLevelData.ComputeScore()}");
