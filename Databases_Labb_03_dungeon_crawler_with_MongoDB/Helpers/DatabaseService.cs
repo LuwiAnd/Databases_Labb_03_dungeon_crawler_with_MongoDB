@@ -291,16 +291,15 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
 
             Console.Clear();
 
-            var allUsers = await users.GetAllAsync();
-            var usernames = allUsers.Select(u => u.Name).ToList();
+            var filteredUsers = await users.GetAllAsync();
+            var usernames = filteredUsers.Select(u => u.Name).ToList();
 
             List<string?> options = usernames;
 
-            string search = "";
-            int selected = 0;
+            
+
+
             int numberOfOptions = usernames.Count;
-
-
             if (numberOfOptions == 0)
             {
                 Console.WriteLine("There are no users in the database to load.");
@@ -309,118 +308,98 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                 return null;
             }
 
+            string search = "";
+            int selected = 0;
 
-            void DrawDeselect(int option)
-            {
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.SetCursorPosition(0, option);
-                Console.Write(options[option]);
-            }
 
-            void DrawSelect(int option)
-            {
-                Console.BackgroundColor = ConsoleColor.DarkGray;
-                Console.SetCursorPosition(0, option);
-                Console.Write(options[option]);
-            }
+            
 
-            void DrawBigList()
-            {
-                Console.Clear();
-
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.WriteLine($"{((selected - 2 + numberOfOptions) % numberOfOptions)}. {options[((selected - 2 + numberOfOptions) % numberOfOptions)]}");
-                Console.WriteLine($"{((selected - 1 + numberOfOptions) % numberOfOptions)}. {options[((selected - 1 + numberOfOptions) % numberOfOptions)]}");
-                Console.BackgroundColor = ConsoleColor.DarkGray;
-                Console.Write($"{selected}. {options[selected]}");
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.WriteLine("");
-                Console.WriteLine($"{((selected + 1 + numberOfOptions) % numberOfOptions)}. {options[((selected + 1 + numberOfOptions) % numberOfOptions)]}");
-                Console.WriteLine($"{((selected + 2 + numberOfOptions) % numberOfOptions)}. {options[((selected + 2 + numberOfOptions) % numberOfOptions)]}");
-            }
-
-            Console.WriteLine("Choose a user by using the up and down arrow keys.");
-            Console.WriteLine("Start typing a username to filter the list.");
-            Console.WriteLine("Press Enter key to select highlighted user.");
-            Console.WriteLine("Press escape to exit without loading a user.");
+            Console.WriteLine("Välj en användare med hjälp av piltangenterna.");
+            Console.WriteLine("Skriv en söksträng för att hitta en användare.");
+            Console.WriteLine("Tryck på Enter för att välja den markerad användaren.");
+            Console.WriteLine("Tryck på Esc för att gå till föregående meny utan att ladda en användare.");
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
             Console.WriteLine();
 
-            var (left, top) = Console.GetCursorPosition();
+            int inputRow = Console.CursorTop - 2;
+            int listRow = Console.CursorTop;
+
+            MenuViewer.View(row: listRow, options: options, selected: 0);
 
             ConsoleKeyInfo cki;
             int intervalTime = 50;
 
-            MenuViewer.View(row: top, options: options, selected: 0);
+
+            async Task RefreshAsync()
+            {
+                filteredUsers = await users.GetByNameAsync(search);
+                options = filteredUsers.Select(u => u!.Name).ToList();
+
+                Console.SetCursorPosition(0, inputRow);
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                string prompt = "Sök: " + search;
+                Console.Write(prompt.PadRight(Console.WindowWidth));
+                Console.ForegroundColor = ConsoleColor.White;
+
+                if (options.Count == 0) selected = 0;
+                else
+                {
+                    if (selected >= options.Count) selected = options.Count - 1;
+                    if (selected < 0) selected = 0;
+                }
+
+                MenuViewer.View(row: listRow, options: options, selected: selected);
+
+                Console.SetCursorPosition(Math.Min(prompt.Length, Console.WindowWidth - 1), inputRow);
+            }
+
+            await RefreshAsync();
 
             while (true)
             {
-                while (Console.KeyAvailable == false)
+                string prompt = "Sök: " + search;
+                Console.SetCursorPosition(Math.Min(prompt.Length, Console.WindowWidth - 1), inputRow);
+
+                cki = Console.ReadKey();
+
+                if (cki.Key == ConsoleKey.UpArrow)
                 {
-                    Thread.Sleep(intervalTime);
+                    if (options.Count > 0) { selected = (selected - 1 + options.Count) % options.Count; }
+                    MenuViewer.View(row: listRow, options: options, selected: selected);
                 }
-
-                if (Console.KeyAvailable)
+                else if (cki.Key == ConsoleKey.DownArrow)
                 {
-                    cki = Console.ReadKey();
-
-
-
-                    //if (numberOfOptions <= 5)
-                    if (false)
+                    if (options.Count > 0) { selected = (selected + 1) % options.Count; }
+                    MenuViewer.View(row: listRow, options: options, selected: selected);
+                }
+                else if (cki.Key == ConsoleKey.Enter)
+                {
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Clear();
+                    return (options.Count == 0) ? null : filteredUsers[selected];
+                }
+                else if (cki.Key == ConsoleKey.Escape)
+                {
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Clear();
+                    return null;
+                }
+                else if (cki.Key == ConsoleKey.Backspace)
+                {
+                    if (search.Length > 0)
                     {
-                        if (cki.Key == ConsoleKey.UpArrow)
-                        {
-                            DrawDeselect(selected);
-                            selected--;
-                            selected = (selected + numberOfOptions) % numberOfOptions;
-                            DrawSelect(selected);
-                        }
-                        else if (cki.Key == ConsoleKey.DownArrow)
-                        {
-                            DrawDeselect(selected);
-                            selected++;
-                            selected = selected % numberOfOptions;
-                            DrawSelect(selected);
-                        }
-                        else if (cki.Key == ConsoleKey.Enter)
-                        {
-                            Console.BackgroundColor = ConsoleColor.Black;
-                            Console.Clear();
-                            //return selected;
-                            return allUsers[selected];
-                        }
+                        search = search[..^1];
+                        await RefreshAsync();
                     }
-                    else
-                    {
-                        if (cki.Key == ConsoleKey.UpArrow)
-                        {
-                            selected--;
-                            selected = (selected + numberOfOptions) % numberOfOptions;
-                            //DrawBigList();
-                            MenuViewer.View(row: top, options: options, selected: selected);
-                        }
-                        else if (cki.Key == ConsoleKey.DownArrow)
-                        {
-                            selected++;
-                            selected = selected % numberOfOptions;
-                            //DrawBigList();
-                            MenuViewer.View(row: top, options: options, selected: selected);
-                        }
-                        else if (cki.Key == ConsoleKey.Enter)
-                        {
-                            Console.BackgroundColor = ConsoleColor.Black;
-                            Console.Clear();
-                            //return selected;
-                            return allUsers[selected];
-                        }
-                        else if (cki.Key == ConsoleKey.Escape)
-                        {
-                            Console.BackgroundColor = ConsoleColor.Black;
-                            Console.Clear();
-                            return null;
-                        }
-                    }
-
+                }
+                else
+                {
+                    char ch = cki.KeyChar;
+                    search += ch;
+                    await RefreshAsync();
                 }
             }
 
@@ -466,6 +445,112 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                 .FirstOrDefault();
 
             return game;
+        }
+
+
+        public static async Task DisplayHighScore(
+            IGameRepository games, 
+            ILevelRepository levels, 
+            IUserRepository users,
+            User? user = null,
+            int numberToShow = 3
+            )
+        {
+            var allGames = await games.GetAllAsync();
+            var finishedGames = allGames
+                .Where(
+                    g => g.GameStatus != GameStatus.Ongoing
+                    &&
+                    g.Score.HasValue
+                );
+
+
+            if(user != null)
+            {
+                finishedGames = finishedGames
+                    .Where(g => g.UserId == user.Id);
+            }
+
+            if (!finishedGames.Any())
+            {
+                Console.WriteLine("Inga avslutade spel att visa.");
+                Console.WriteLine();
+                Console.WriteLine("Tryck på valfri tangent för att gå tillbaka.");
+                Console.ReadKey(true);
+                return;
+            }
+
+
+            //var playedLevels = allGames.Select(g => g.LevelId).ToList().Distinct();
+            //foreach(string levelId in playedLevels)
+            //{
+            //    var level = await levels.GetByIdAsync(levelId);
+            //    var levelName = level?.Name ?? "Okänt namn";
+            //    Console.WriteLine($"Bana: {levelName}");
+
+            //    var highScores = allGames
+            //        .Where(g => g.LevelId == levelId)
+            //        .OrderBy(g => g.score)...
+            //}
+
+            var gamesByLevel = finishedGames.GroupBy(g => g.LevelId);
+
+            var uniqueUserIds = finishedGames
+                .Select(g => g.UserId)
+                .Distinct()
+                .ToList();
+
+            var userMap = new Dictionary<string, string>();
+            foreach(var userId in uniqueUserIds)
+            {
+                var u = await users.GetByIdAsync(userId);
+                userMap[userId] = u?.Name ?? "Okänd spelare";
+            }
+
+            foreach(var group in gamesByLevel)
+            {
+                var level = await levels.GetByIdAsync(group.Key);
+                var levelName = level?.Name ?? "Okänd bana";
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Bana: {levelName}");
+                Console.ForegroundColor = ConsoleColor.White;
+
+                var topScores = group
+                    .OrderByDescending(g => g.Score!.Value)
+                    .ThenBy(g => g.CompletedAt ?? DateOnly.MaxValue)
+                    .Take(numberToShow)
+                    .ToList();
+
+                if (!topScores.Any())
+                {
+                    Console.WriteLine("Inga resultat att visa än.");
+                    continue;
+                }
+
+                for(int i = 0; i < numberToShow; i++)
+                {
+                    if(i >= topScores.Count)
+                    {
+                        Console.WriteLine($"{i + 1}. För få avslutade spel.");
+                        continue;
+                    }
+
+                    var topGame = topScores[i];
+                    //var userName = userMap[topGame.UserId];
+                    var userName = userMap.TryGetValue(topGame.UserId, out var name) ? name : "Okänd spelare";
+                    var score = topGame.Score;
+                    var date = topGame.CompletedAt?.ToString("yyyy-MM-dd") ?? "Okänt datum";
+
+                    Console.WriteLine($"{i + 1}. {userName} - {score} - {date}");
+                }
+
+                Console.WriteLine();
+                
+            }
+
+            Console.WriteLine("Tryck på valfri tangent för att gå tillbaka.");
+            Console.ReadLine();
         }
     }
 }

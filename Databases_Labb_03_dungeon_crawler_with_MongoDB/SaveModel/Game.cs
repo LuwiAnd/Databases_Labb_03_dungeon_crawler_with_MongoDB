@@ -34,6 +34,9 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.SaveModel
         // för att inte bli förvirrad om tiden inte stämmer med min
         // dators klocka.
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        public int? Score { get; set; }
+        public DateOnly? CompletedAt { get; set; }
         
     }
 }

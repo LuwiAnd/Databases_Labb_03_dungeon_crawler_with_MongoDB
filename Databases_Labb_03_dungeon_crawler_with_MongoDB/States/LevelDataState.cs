@@ -1,5 +1,6 @@
 ﻿using Databases_Labb_03_dungeon_crawler_with_MongoDB.Factories;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.States
         public HeroState Hero { get; set; } = new();
         public List<string> Messages { get; set; }
         public int TurnCount { get; set; }
+        public GameStatus GameStatus { get; set; } = GameStatus.Ongoing;
 
         public LevelDataState(LevelData levelData)
         {

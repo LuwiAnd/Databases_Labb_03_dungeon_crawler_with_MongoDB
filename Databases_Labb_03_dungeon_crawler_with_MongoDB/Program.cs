@@ -6,6 +6,8 @@ using Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Implementations;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Interfaces;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.SaveModel;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.States;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.Types;
 using MongoDB.Driver;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
@@ -106,12 +108,26 @@ namespace Labb_02_dungeon_crawler
                     List<string> userNewOldOptions = new List<string>
                     {
                         "Skapa en ny användare.",
-                        "Välj en befintlig användare."
+                        "Välj en befintlig användare.",
+                        "Visa Highscore-listan."
                     };
                     while (optionTmp == null)
                     {
-                        Console.WriteLine("Vill du skapa en ny användare eller välja en befintlig?");
-                        optionTmp = MenuViewer.View(userNewOldOptions);
+                        //Console.WriteLine("Steg 1. Vad vill du göra nu?");
+                        optionTmp = MenuViewer.View(userNewOldOptions, "Steg 1. Vad vill du göra nu?");
+                        //optionTmp = MenuViewer.View(1, userNewOldOptions, 0);
+
+                        if (optionTmp != null && optionTmp.Value == 2)
+                        {
+                            optionTmp = null;
+
+                            await DatabaseService.DisplayHighScore(
+                                games: gameRepo,
+                                levels: levelRepo,
+                                users: userRepo,
+                                user: null
+                            );
+                        }
                     }
                     
 
@@ -123,7 +139,7 @@ namespace Labb_02_dungeon_crawler
                         //Console.WriteLine("Skriv in ditt användarnamn (högst 10 tecken)");
                         selectedUser = await DatabaseService.CreateUserAsync(userRepo);
                     }
-                    else
+                    else 
                     {
                         selectedUser = await DatabaseService.LoadUserAsync(userRepo);
                     }
@@ -147,11 +163,12 @@ namespace Labb_02_dungeon_crawler
                     List<string> tmpOptions = new List<string>
                     {
                         "Starta ett nytt spel.",
-                        "Ladda ditt pågående spel (om det inte finns startas ett nytt spel)"
+                        "Ladda ditt pågående spel (om det inte finns startas ett nytt spel).",
+                        "Visa mina rekord."
                     };
 
                     var tmpSelected = MenuViewer.View(tmpOptions);
-                    if (!tmpSelected.HasValue) continue;
+                    if (!tmpSelected.HasValue) break;
 
                     //switch (tmpSelected)
                     //{
@@ -212,20 +229,37 @@ namespace Labb_02_dungeon_crawler
 
                         currentLevelData = new LevelData(selectedGame.LevelDataState);
                     }
+                    else if(tmpSelected.Value == 2)
+                    {
+                        await DatabaseService.DisplayHighScore(
+                            games: gameRepo,
+                            levels: levelRepo,
+                            users: userRepo,
+                            user: selectedUser
+                        );
+                    }
                     else
                     {
                         Console.WriteLine("Ogiltigt val.");
                     }
                 }
 
+                if (currentLevelData == null) continue;
+
                 currentLevelData.RenderInitialFrame();
                 await GameLoop.PlayGameAsync(
                     currentLevelData,
                     async ld =>
                     {
-                        selectedGame!.LevelDataState = new Databases_Labb_03_dungeon_crawler_with_MongoDB.States.LevelDataState(ld);
+                        selectedGame!.LevelDataState = new LevelDataState(ld);
                         selectedGame.GameStatus = ld.GameStatus;
                         
+                        if(ld.GameStatus != GameStatus.Ongoing)
+                        {
+                            selectedGame.Score = ld.ComputeScore();
+                            selectedGame.CompletedAt = DateOnly.FromDateTime(DateTime.Today);
+                        }
+
                         await gameRepo.UpdateAsync(selectedGame);
                     }
                 );

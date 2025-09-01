@@ -13,8 +13,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
     {
         public static async Task PlayGameAsync(
             LevelData levelData,
-            Func<LevelData, Task?> saveGameStateAsync = null,
-            CancellationToken ct = default
+            Func<LevelData, Task?>? saveGameStateAsync = null
         )
         {
 

@@ -9,12 +9,14 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
 {
     internal class MenuViewer
     {
-        public static int? View(List<string> options)
+        public static int? View(List<string> options, string question = "")
         {
             if(options == null || options.Count == 0)
             { 
                 return null;
             }
+
+            
 
             int selected = 0;
             int numberOfOptions = options.Count;
@@ -22,20 +24,24 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
             void DrawDeselect(int option)
             {
                 Console.BackgroundColor = ConsoleColor.Black;
-                Console.SetCursorPosition(0, option);
+                Console.SetCursorPosition(0, option + 1);
                 Console.Write(options[option]);
             }
 
             void DrawSelect(int option)
             {
                 Console.BackgroundColor = ConsoleColor.DarkGray;
-                Console.SetCursorPosition(0, option);
+                Console.SetCursorPosition(0, option + 1);
                 Console.Write(options[option]);
             }
 
             void DrawBigList()
             {
                 Console.Clear();
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine(question);
+                Console.ForegroundColor = ConsoleColor.White;
 
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.WriteLine($"{((selected - 2 + numberOfOptions) % numberOfOptions)}. {options[((selected - 2 + numberOfOptions) % numberOfOptions)]}");
@@ -51,7 +57,11 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
             
 
             Console.Clear();
-            if(numberOfOptions <= 5)
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(question);
+            Console.ForegroundColor = ConsoleColor.White;
+
+            if (numberOfOptions <= 5)
             {
                 for (int i = 0; i < numberOfOptions; i++)
                 {
@@ -152,6 +162,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
 
 
         //public static int? View(int row, List<string> options, int selected)
+        //public static void View(int row, List<string> options, int selected)
         public static void View(int row, List<string> options, int selected)
         {
             if (options == null || options.Count == 0)

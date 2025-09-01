@@ -16,5 +16,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.States
         public DateTime SavedAt { get; set; } = DateTime.Now;
 
         public LevelDataState LevelData { get; set; } = new();
+
+        public int? Score { get; set; }
+        public DateOnly? CompletedAt { get; set; }
     }
 }
