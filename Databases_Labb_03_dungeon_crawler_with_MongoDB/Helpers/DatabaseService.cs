@@ -493,7 +493,25 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
             //        .OrderBy(g => g.score)...
             //}
 
-            var gamesByLevel = finishedGames.GroupBy(g => g.LevelId);
+
+            // Jag vill att highscore-listan ska sorteras efter level.Name, inte level.Id.
+            var playedLevels = finishedGames.Select(g => g.LevelId).ToList().Distinct();
+            var allLevels = await levels.GetAllAsync();
+            var namedLevels = allLevels
+                .Where(l => playedLevels.Contains(l.Id))
+                .Distinct()
+                .OrderBy(l => l.Name);
+
+            var levelMap = new Dictionary<string, string>();
+            foreach(var nl in namedLevels)
+            {
+                levelMap[nl.Id] = nl.Name ?? $"Gammal bana med id {nl.Id}";
+            }
+
+            //var gamesByLevel = finishedGames.GroupBy(g => g.LevelId);
+            var gamesByLevel = finishedGames
+                .OrderBy(g => levelMap[g.LevelId])
+                .GroupBy(g => levelMap[g.LevelId]);
 
             var uniqueUserIds = finishedGames
                 .Select(g => g.UserId)
@@ -509,8 +527,12 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
 
             foreach(var group in gamesByLevel)
             {
-                var level = await levels.GetByIdAsync(group.Key);
-                var levelName = level?.Name ?? "Okänd bana";
+                //var level = await levels.GetByIdAsync(group.Key);
+                //var levelName = level?.Name ?? "Okänd bana";
+                var levelName = group.Key;
+
+
+
 
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"Bana: {levelName}");
@@ -549,7 +571,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                 
             }
 
-            Console.WriteLine("Tryck på valfri tangent för att gå tillbaka.");
+            Console.WriteLine("Tryck på Enter för att gå tillbaka.");
             Console.ReadLine();
         }
     }
