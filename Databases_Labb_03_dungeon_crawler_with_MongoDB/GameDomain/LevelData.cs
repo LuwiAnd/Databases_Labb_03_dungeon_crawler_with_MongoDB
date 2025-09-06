@@ -247,6 +247,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
             Console.BackgroundColor = ConsoleColor.Black; // Jag tror inte att denna behövs, men använder för säkerhets skull.
             Console.Clear();
 
+            Console.WriteLine("Använd piltangenterna för att spela och L för att se händelsehistoriken.");
+
             foreach (var e in Elements)
             {
                 if (drawAllElements || e.IsVisible || GeneralDungeonFunctions.IsVisible(Hero.Position, e.Position))

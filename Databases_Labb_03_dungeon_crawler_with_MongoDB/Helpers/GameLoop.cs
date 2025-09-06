@@ -26,6 +26,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
             Console.WriteLine("Använd piltangenterna för att spela och L för att se händelsehistoriken.");
             Console.WriteLine(""); // rad för spelarens attack
             Console.WriteLine(""); // rad för fiendens attack
+            Console.WriteLine("");
 
 
             bool gameOver = false;
@@ -71,8 +72,9 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
             {
                 Console.SetCursorPosition(10, 22);
                 Console.ForegroundColor = ConsoleColor.Magenta;
-                Console.WriteLine("You died! Game over!");
+                Console.WriteLine("Du dog! Spelet är slut!");
                 Console.ForegroundColor = ConsoleColor.White;
+                Thread.Sleep(2000);
                 //break;
                 return true;
             }

@@ -22,7 +22,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
         public const ConsoleColor goalColor = ConsoleColor.Yellow;
 
         public const int mapDisplacementX = 0;
-        public const int mapDisplacementY = 2;
+        public const int mapDisplacementY = 3;
 
         public const int maxConsoleMessageLenght = 120;
 
@@ -71,9 +71,9 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
         {
             string clearConsoleString = "   ".PadLeft(maxConsoleMessageLenght, ' ');
             (int left, int top) = Console.GetCursorPosition();
-            Console.SetCursorPosition(0, 0);
-            Console.Write(clearConsoleString);
             Console.SetCursorPosition(0, 1);
+            Console.Write(clearConsoleString);
+            Console.SetCursorPosition(0, 2);
             Console.Write(clearConsoleString);
             Console.SetCursorPosition(left, top);
 

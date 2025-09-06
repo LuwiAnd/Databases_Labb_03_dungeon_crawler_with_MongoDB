@@ -118,6 +118,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                     if (cki.Key == ConsoleKey.L)
                     {
                         LogViewer.Show(levelData.Messages);
+                        //Console.WriteLine("Använd piltangenterna för att spela och L för att se händelsehistoriken.");
 
                         levelData.RenderInitialFrame();
                         okDirection = false;
@@ -371,7 +372,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                 $"Damage = {enemyDamage}.";
 
             (int left, int top) = Console.GetCursorPosition();
-            Console.SetCursorPosition(0, 0);
+            Console.SetCursorPosition(0, 1);
             Console.ForegroundColor = ConsoleColor.Green;
             //Console.WriteLine($"Player (HP: {HP}) throw dices: {AttackDice.ToString()} => {heroAttack}. {enemy.Type} (HP: {enemy.HP}) throw: {enemy.DefenceDice.ToString()} => {enemyDefence}. Damage = {enemyDamage}.");
             Console.WriteLine(message);

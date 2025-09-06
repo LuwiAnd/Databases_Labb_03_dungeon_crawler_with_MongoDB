@@ -41,7 +41,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                 $"Damage = {damage}.";
 
             (int left, int top) = Console.GetCursorPosition();
-            Console.SetCursorPosition(0, 1);
+            Console.SetCursorPosition(0, 2);
             Console.ForegroundColor = ConsoleColor.Red;
             //Console.WriteLine($"{Type} (HP: {HP}) throws dices: {AttackDice.ToString()} => {attack}. Hero (HP: {hero.HP}) throws: {hero.DefenceDice.ToString()} => {defence}. Damage = {damage}.");
             Console.WriteLine(message);
