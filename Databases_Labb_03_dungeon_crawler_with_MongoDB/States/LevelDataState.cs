@@ -29,6 +29,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.States
 
             //Messages = levelData.Messages; // Detta verkar göra att jag har två refernser till samma lista istället för att ha en kopia i objekt av denna klass.
             Messages = new List<string>(levelData.Messages);
+
+            GameStatus = levelData.GameStatus;
         }
 
         public LevelDataState()

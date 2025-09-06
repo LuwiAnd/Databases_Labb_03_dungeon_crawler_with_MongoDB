@@ -43,6 +43,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
         public LevelData(LevelDataState state)
         {
             Hero = new Hero(state.Hero);
+            TurnCount = state.TurnCount;
             Elements = state.Elements
                 .Select(LevelElementFactory.FromState)
                 .ToList();
@@ -50,6 +51,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
             // Jag tror inte att en LevelDataState kan ha en Messages
             // som är null, men det här är för säkerhets skull.
             Messages = state.Messages?.ToList() ?? new();
+
+            GameStatus = state.GameStatus;
         }
 
         public void Load(string fileName)
@@ -194,8 +197,15 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
 
         public int ComputeScore()
         {
-            int score = (int)Math.Round(Hero.HP) + TotalDamageDealt + KillBonus - TurnCount;
-            return Math.Max(0, score);
+            if (GameStatus == GameStatus.Ongoing) return 0;
+            else if (GameStatus == GameStatus.HeroDead) return TotalDamageDealt + KillBonus + Math.Min(TurnCount, 100);
+            else
+            {
+                int winBonus = 3000;
+                int score = winBonus + 20 * (int)Math.Round(Hero.HP) + 10 * TotalDamageDealt + KillBonus - TurnCount;
+                return Math.Max(0, score);
+            }
+            
         }
 
 
@@ -234,6 +244,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
 
         public void RenderInitialFrame(bool drawAllElements = false)
         {
+            Console.BackgroundColor = ConsoleColor.Black; // Jag tror inte att denna behövs, men använder för säkerhets skull.
             Console.Clear();
 
             foreach (var e in Elements)

@@ -41,7 +41,12 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
 
                 if (!continueToPlay) break;
 
-                if (CheckIsHeroDead(levelData.Hero)) break;
+                if (CheckIsHeroDead(levelData.Hero)) 
+                {
+                    levelData.GameStatus = GameStatus.HeroDead;
+                    await saveGameStateAsync(levelData);
+                    break;
+                } 
 
                 levelData.UpdateWalls();
                 levelData.UpdateGoal();

@@ -37,6 +37,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
 
             void DrawBigList()
             {
+                Console.BackgroundColor = ConsoleColor.Black; // Jag tror inte att denna behövs, men använder för säkerhets skull.
                 Console.Clear();
 
                 Console.ForegroundColor = ConsoleColor.Cyan;
@@ -54,8 +55,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                 Console.WriteLine($"{((selected + 2 + numberOfOptions) % numberOfOptions)}. {options[((selected + 2 + numberOfOptions) % numberOfOptions)]}");
             }
 
-            
 
+            Console.BackgroundColor = ConsoleColor.Black; // Jag tror inte att denna behövs, men använder för säkerhets skull.
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine(question);

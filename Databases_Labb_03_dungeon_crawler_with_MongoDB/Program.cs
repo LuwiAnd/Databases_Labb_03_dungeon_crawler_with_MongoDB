@@ -291,6 +291,7 @@ namespace Labb_02_dungeon_crawler
 
                 if (continueToPlay)
                 {
+                    Console.BackgroundColor = ConsoleColor.Black; // Jag tror inte att denna behövs, men använder för säkerhets skull.
                     Console.Clear();
                     Console.SetCursorPosition(0, 3);
                     Console.WriteLine($"Status: {currentLevelData.GameStatus}");

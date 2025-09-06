@@ -61,6 +61,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
         // Den här versionen ska jag inte använda längre, eftersom jag använder repository pattern.
         public static void CreateUser(IMongoCollection<User> users)
         {
+            Console.BackgroundColor = ConsoleColor.Black; // Jag tror inte att denna behövs, men använder för säkerhets skull.
             Console.Clear();
 
             var allUsers = users.Find<User>(FilterDefinition<User>.Empty).ToList();
@@ -96,6 +97,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
         //public static async Task<User> CreateUserAsync(IUserRepository users)
         public static async Task<User?> CreateUserAsync(IUserRepository users)
         {
+            Console.BackgroundColor = ConsoleColor.Black; // Jag tror inte att denna behövs, men använder för säkerhets skull.
             Console.Clear();
 
             var usernames = (await users.GetAllAsync())
@@ -327,7 +329,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
 
         public static async Task<User?> LoadUserAsync(IUserRepository users)
         {
-
+            Console.BackgroundColor = ConsoleColor.Black; // Jag tror inte att denna behövs, men använder för säkerhets skull.
             Console.Clear();
 
             var filteredUsers = await users.GetAllAsync();

@@ -17,6 +17,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
 
             while (true)
             {
+                Console.BackgroundColor = ConsoleColor.Black; // Jag tror inte att denna behövs, men använder för säkerhets skull.
                 Console.Clear();
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine("Meddelandelogg");
