@@ -93,7 +93,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
         }
 
 
-        public static async Task<User> CreateUserAsync(IUserRepository users)
+        //public static async Task<User> CreateUserAsync(IUserRepository users)
+        public static async Task<User?> CreateUserAsync(IUserRepository users)
         {
             Console.Clear();
 
@@ -102,11 +103,50 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                 .Select(u => u.Name)
                 .ToList();
 
-            User createdUser;
+            User? createdUser = null;
             while (true)
             {
                 Console.WriteLine("Ange ett användarnamn (1–10 tecken, endast a–ö/A–Ö/0–9):");
-                string? username = Console.ReadLine();
+                Console.WriteLine("Tryck på Escape för att avbryta.");
+
+                (int left, int top) = Console.GetCursorPosition();
+
+                string? username = "";
+                ConsoleKeyInfo cki;
+
+                while (true)
+                {
+                    cki = Console.ReadKey(intercept: true);
+
+                    if (cki.Key == ConsoleKey.Escape)
+                    {
+                        return null;
+                    } 
+                    else if(cki.Key == ConsoleKey.Enter)
+                    {
+                        Console.WriteLine();
+                        break;
+                    }
+                    else if(cki.Key == ConsoleKey.Backspace)
+                    {
+                        if(username.Length > 0)
+                        {
+                            username = username[..^1];
+                            //Console.Write(username);
+                            Console.SetCursorPosition(left, top);
+                            Console.Write(username.PadRight(10, ' '));
+                            Console.SetCursorPosition(left + username.Length, top);
+                        }
+                    }
+                    else if(Regex.IsMatch(cki.KeyChar.ToString(), @"^[0-9A-Za-zÅÄÖåäö]{1,10}$") && username.Length < 10)
+                    {
+                        username += cki.KeyChar.ToString();
+                        Console.Write(cki.KeyChar);
+                    }
+                }
+                
+                
+                username = username.Trim();
 
 
                 if (string.IsNullOrWhiteSpace(username))
@@ -115,25 +155,24 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                     continue;
                 }
 
-                username = username.Trim();
 
-                var valid = Regex.IsMatch(username, @"^[0-9A-Za-zÅÄÖåäö]{1,10}$");
-                if (!valid)
-                {
-                    Console.WriteLine("Ogiltigt namn. Tillåtna tecken: a–ö, A–Ö och 0–9. Max 10 tecken.");
-                    continue;
-                }
+                //var valid = Regex.IsMatch(username, @"^[0-9A-Za-zÅÄÖåäö]{1,10}$");
+                //if (!valid)
+                //{
+                //    Console.WriteLine("Ogiltigt namn. Tillåtna tecken: a–ö, A–Ö och 0–9. Max 10 tecken.");
+                //    continue;
+                //}
 
                 if (usernames.Contains(username))
                 {
-                    Console.WriteLine($"Username \"{username}\" already exists.");
+                    Console.WriteLine($"Användarnamnet \"{username}\" finns redan.[k1]");
                     continue;
                 }
 
 
                 if (await users.ExistsByNameAsync(username))
                 {
-                    Console.WriteLine($"Användarnamnet \"{username}\" finns redan.");
+                    Console.WriteLine($"Användarnamnet \"{username}\" finns redan.[k2]");
                     continue;
                 }
 
@@ -418,18 +457,31 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
         //    MenuViewer.View()
         //}
 
-        public static async Task<Level> LoadLevelAsync(ILevelRepository levels)
+        public static async Task<Level?> LoadLevelAsync(ILevelRepository levels)
         {
             var allLevels = (await levels.GetAllAsync()).ToList();
             var levelNames = allLevels.Select(l => l.Name).ToList();
 
             int? selected = null;
-            while(selected == null)
+            //while(selected == null)
+            //{
+            //    selected = MenuViewer.View(options: levelNames);
+            //}
+            selected = MenuViewer.View(options: levelNames);
+            
+
+            if(selected == null)
             {
-                selected = MenuViewer.View(options: levelNames);
+                //Console.SetCursorPosition(0, Console.CursorTop);
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Clear();
+                Console.WriteLine("Återgår till föregående meny.");
+                Thread.Sleep(1000);
+                return null;
             }
 
             Console.WriteLine($"Du valde bana: {levelNames[selected.Value]}");
+            Thread.Sleep(2000);
 
             return allLevels[selected.Value];
         }
@@ -571,8 +623,10 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                 
             }
 
-            Console.WriteLine("Tryck på Enter för att gå tillbaka.");
-            Console.ReadLine();
+            Console.WriteLine("Tryck på valfri tangent för att gå tillbaka.");
+            //Console.ReadLine();
+            Console.ReadKey(true);
+
         }
     }
 }

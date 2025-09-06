@@ -76,8 +76,10 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
         }
 
         //public void Update(List<LevelElement> elements)
-        public void Update(LevelData levelData)
+        //public void Update(LevelData levelData)
+        public bool Update(LevelData levelData)
         {
+            bool continueToPlay = true;
 
             List<LevelElement> elements = levelData.Elements;
 
@@ -108,6 +110,11 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                     //enemyInTheWay = false;
                     //enemyMovedAway = false;
 
+                    if(cki.Key == ConsoleKey.Escape)
+                    {
+                        continueToPlay = false;
+                        return continueToPlay;
+                    }
                     if (cki.Key == ConsoleKey.L)
                     {
                         LogViewer.Show(levelData.Messages);
@@ -261,6 +268,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
             }
 
             levelData.TurnCount++;
+
+            return continueToPlay;
         }
 
         private bool HandleArrowKeys(string direction, LevelData levelData)

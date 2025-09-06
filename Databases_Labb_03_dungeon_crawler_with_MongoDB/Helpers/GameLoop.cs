@@ -11,7 +11,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
 {
     internal static class GameLoop
     {
-        public static async Task PlayGameAsync(
+        //public static async Task PlayGameAsync(
+        public static async Task<bool> PlayGameAsync(
             LevelData levelData,
             Func<LevelData, Task?>? saveGameStateAsync = null
         )
@@ -28,6 +29,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
 
 
             bool gameOver = false;
+            bool continueToPlay = true;
             while (!gameOver)
             {
                 if (levelData.GameStatus == GameStatus.Completed || levelData.GameStatus == GameStatus.HeroDead) break;
@@ -35,7 +37,10 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                 if (levelData.TurnsUntilClearingMessages > 0) levelData.TurnsUntilClearingMessages--;
                 else GeneralDungeonFunctions.ClearConsoleMessages();
 
-                levelData.Hero.Update(levelData);
+                continueToPlay = levelData.Hero.Update(levelData);
+
+                if (!continueToPlay) break;
+
                 if (CheckIsHeroDead(levelData.Hero)) break;
 
                 levelData.UpdateWalls();
@@ -51,6 +56,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
 
                 await saveGameStateAsync(levelData);
             }
+
+            return continueToPlay;
         }
 
         private static bool CheckIsHeroDead(Hero hero)

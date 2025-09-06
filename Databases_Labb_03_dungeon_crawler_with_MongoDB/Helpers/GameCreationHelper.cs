@@ -76,6 +76,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
             if (selectedLevel == null)
             {
                 Console.WriteLine("Ingen level vald.");
+                Thread.Sleep(2000);
                 return (null, null);
             }
 

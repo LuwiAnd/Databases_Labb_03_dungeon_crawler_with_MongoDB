@@ -81,11 +81,22 @@ namespace Labb_02_dungeon_crawler
             // Loop för hela mitt program som kommer att köras tills programmet avslutas.
             while (true)
             {
-                selectedUser = null;
-                selectedLevel = null;
-                selectedGame = null;
-                currentLevelData = null;
+                if(selectedUser == null)
+                {
+                    selectedLevel = null;
+                    selectedGame = null;
+                    currentLevelData = null;
+                }
+                else if(selectedLevel == null)
+                {
+                    selectedGame = null;
+                    currentLevelData = null;
+                }else if(selectedGame == null)
+                {
+                    currentLevelData = null;
+                }
 
+                Console.BackgroundColor = ConsoleColor.Black;
                 Console.Clear();
                 Console.WriteLine("Dungeon Crawler (MongoDB) — Huvudmeny");
                 Console.WriteLine("--------------------------------------");
@@ -100,54 +111,57 @@ namespace Labb_02_dungeon_crawler
                 //bool gameCollectionHasData  = db.GetCollection< Game>( "games").Find(FilterDefinition< Game>.Empty).Any();
 
                 ////bool levelCollectionHasData = db.ListCollectionNames().ToList().Contains("levels");
-
-                bool userCollectionHasData = await userRepo.HasElements();
-                if (userCollectionHasData)
+                if(selectedUser == null)
                 {
-                    int? optionTmp = null;
-                    List<string> userNewOldOptions = new List<string>
+                    bool userCollectionHasData = await userRepo.HasElements();
+                    if (userCollectionHasData)
                     {
-                        "Skapa en ny användare.",
-                        "Välj en befintlig användare.",
-                        "Visa Highscore-listan."
-                    };
-                    while (optionTmp == null)
-                    {
-                        //Console.WriteLine("Steg 1. Vad vill du göra nu?");
-                        optionTmp = MenuViewer.View(userNewOldOptions, "Steg 1. Vad vill du göra nu?");
-                        //optionTmp = MenuViewer.View(1, userNewOldOptions, 0);
-
-                        if (optionTmp != null && optionTmp.Value == 2)
+                        int? optionTmp = null;
+                        List<string> userNewOldOptions = new List<string>
                         {
-                            optionTmp = null;
+                            "Skapa en ny användare.",
+                            "Välj en befintlig användare.",
+                            "Visa Highscore-listan."
+                        };
+                        while (optionTmp == null)
+                        {
+                            //Console.WriteLine("Steg 1. Vad vill du göra nu?");
+                            //optionTmp = MenuViewer.View(1, userNewOldOptions, 0);
+                            optionTmp = MenuViewer.View(userNewOldOptions, "Steg 1. Vad vill du göra nu?");
 
-                            await DatabaseService.DisplayHighScore(
-                                games: gameRepo,
-                                levels: levelRepo,
-                                users: userRepo,
-                                user: null
-                            );
+                            if (optionTmp != null && optionTmp.Value == 2)
+                            {
+                                optionTmp = null;
+
+                                await DatabaseService.DisplayHighScore(
+                                    games: gameRepo,
+                                    levels: levelRepo,
+                                    users: userRepo,
+                                    user: null
+                                );
+                            }
                         }
-                    }
                     
 
-                    Console.WriteLine("Du valde:");
-                    Console.WriteLine(userNewOldOptions[optionTmp.Value]);
+                        Console.WriteLine("Du valde:");
+                        Console.WriteLine(userNewOldOptions[optionTmp.Value]);
 
-                    if(optionTmp.Value == 0)
+                        if(optionTmp.Value == 0)
+                        {
+                            //Console.WriteLine("Skriv in ditt användarnamn (högst 10 tecken)");
+                            selectedUser = await DatabaseService.CreateUserAsync(userRepo);
+                        }
+                        else 
+                        {
+                            selectedUser = await DatabaseService.LoadUserAsync(userRepo);
+                        }
+                    }
+                    else
                     {
-                        //Console.WriteLine("Skriv in ditt användarnamn (högst 10 tecken)");
                         selectedUser = await DatabaseService.CreateUserAsync(userRepo);
                     }
-                    else 
-                    {
-                        selectedUser = await DatabaseService.LoadUserAsync(userRepo);
-                    }
                 }
-                else
-                {
-                    selectedUser = await DatabaseService.CreateUserAsync(userRepo);
-                }
+                
 
                 //// Jag behöver inte kolla att det finns levels här, för det kollar jag när
                 //// jag anropar ImportLevelsFromFolderAsync.
@@ -157,7 +171,7 @@ namespace Labb_02_dungeon_crawler
                 //}
 
                 //while (selectedLevel == null)
-                while (currentLevelData == null)
+                while (currentLevelData == null && selectedUser != null)
                 {
                     Console.WriteLine("Vad vill du göra nu?");
                     List<string> tmpOptions = new List<string>
@@ -168,8 +182,13 @@ namespace Labb_02_dungeon_crawler
                     };
 
                     var tmpSelected = MenuViewer.View(tmpOptions);
-                    if (!tmpSelected.HasValue) break;
-
+                    if (!tmpSelected.HasValue)
+                    {
+                        // Om man tryckt på Escape, så ska man gå tillbaka
+                        // till föregående meny och välja användare på nytt.
+                        selectedUser = null; 
+                        break;
+                    }
                     //switch (tmpSelected)
                     //{
                     //    case 0:
@@ -220,7 +239,12 @@ namespace Labb_02_dungeon_crawler
                         if (selectedGame == null)
                         {
                             Console.WriteLine("Inget pågående spel hittades. Startar nytt i stället.");
-                            var result = await GameCreationHelper.StartNewGameAsync(levelRepo, gameRepo, selectedUser!);
+                            Thread.Sleep(3000);
+                            var result = await GameCreationHelper.StartNewGameAsync(
+                                levelRepo, 
+                                gameRepo, 
+                                selectedUser!
+                            );
                             selectedGame = result.Game;
                             currentLevelData = result.LevelData;
 
@@ -240,14 +264,15 @@ namespace Labb_02_dungeon_crawler
                     }
                     else
                     {
-                        Console.WriteLine("Ogiltigt val.");
+                        // Testkod som kontrollerar att jag inte lagt till något val och glömt att uppdatera min kod.
+                        Console.WriteLine("Ogiltigt val. Uppdatera koden!");
                     }
                 }
 
                 if (currentLevelData == null) continue;
 
                 currentLevelData.RenderInitialFrame();
-                await GameLoop.PlayGameAsync(
+                bool continueToPlay = await GameLoop.PlayGameAsync(
                     currentLevelData,
                     async ld =>
                     {
@@ -264,13 +289,23 @@ namespace Labb_02_dungeon_crawler
                     }
                 );
 
-                Console.Clear();
-                Console.SetCursorPosition(0, 3);
-                Console.WriteLine($"Status: {currentLevelData.GameStatus}");
-                Console.WriteLine($"Poäng:  {currentLevelData.ComputeScore()}");
-                Console.WriteLine();
-                Console.WriteLine("Tryck valfri tangent för att återgå till menyn...");
-                Console.ReadKey(true);
+                if (continueToPlay)
+                {
+                    Console.Clear();
+                    Console.SetCursorPosition(0, 3);
+                    Console.WriteLine($"Status: {currentLevelData.GameStatus}");
+                    Console.WriteLine($"Poäng:  {currentLevelData.ComputeScore()}");
+                    Console.WriteLine();
+                    Console.WriteLine("Tryck valfri tangent för att återgå till menyn...");
+                    Console.ReadKey(true);
+                }
+                
+
+                selectedUser = null;
+                selectedLevel = null;
+                selectedGame = null;
+                currentLevelData = null;
+
 
             }
 
