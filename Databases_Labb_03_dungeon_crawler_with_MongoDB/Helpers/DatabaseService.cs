@@ -638,5 +638,102 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
             Console.ReadKey(true);
 
         }
+
+        public static async Task DeleteUserAndTheirGames(IUserRepository users, IGameRepository games)
+        {
+
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Clear();
+
+            Console.WriteLine("Välj en användare att radera helt (inkl. alla dess spel).");
+            Console.WriteLine("Tryck Escape i användarlistan för att avbryta.");
+            Console.WriteLine();
+
+            var user = await LoadUserAsync(users);
+            if (user == null)
+            {
+                Console.WriteLine("Ingen användare vald. Återgår till huvudmenyn.");
+                Thread.Sleep(2000);
+                return;
+            }
+
+            Console.WriteLine($"Du valde: {user.Name} med id {user.Id}.");
+            Console.WriteLine("Skriv lösenordet för att bekräfta borttagning (eller lämna tomt/tryck Esc för att avbryta).");
+
+            (int left, int passwordRow) = Console.GetCursorPosition();
+            string prompt = "Lösenord: ";
+            Console.Write(prompt);
+
+            string password = "";
+
+            void Refresh()
+            {
+                string censoredPassword = new string('*', password.Length);
+                Console.SetCursorPosition(0, passwordRow);
+                string line = prompt + censoredPassword;
+                //Console.WriteLine($"Lösenord: {censoredPassword}");
+                Console.Write(line.PadRight(Console.WindowWidth));
+                Console.SetCursorPosition(prompt.Length + password.Length, passwordRow);
+            }
+
+            ConsoleKeyInfo cki;
+            while (true)
+            {
+                cki = Console.ReadKey(intercept: true);
+
+                if (cki.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    break;
+                }
+                else if (cki.Key == ConsoleKey.Escape)
+                {
+                    Console.WriteLine("\nAvbrutet.");
+                    Thread.Sleep(2000);
+                    return;
+                }
+                else if (cki.Key == ConsoleKey.Backspace)
+                {
+                    if (password.Length > 0)
+                        password = password[..^1];
+                    Refresh();
+                }
+                else
+                {
+                    if (!char.IsControl(cki.KeyChar) && password.Length < 20)
+                    {
+                        password += cki.KeyChar;
+                        Refresh();
+                    }
+                }
+            }
+
+
+            if (!string.Equals(password, "schack", StringComparison.Ordinal))
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Fel lösenord. Inget togs bort.");
+                Console.ForegroundColor = ConsoleColor.White;
+                Thread.Sleep(2000);
+                return;
+            }
+
+            await DeleteUserAndTheirGames(users, games, user);
+            Console.WriteLine("Klart. Tryck valfri tangent för att återgå.");
+            Console.ReadKey(true);
+
+        }
+
+        public static async Task DeleteUserAndTheirGames(IUserRepository users, IGameRepository games, User user)
+        {
+            if (user is null) throw new ArgumentNullException(nameof(user));
+
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            var removedGames = await games.DeleteByUserAsync(user);
+            Console.WriteLine($"Spelare hade {removedGames} som nu togs bort.");
+            var removedUsers = await users.DeleteAsync(user);
+            Console.WriteLine($"{removedUsers} stycken spelare med id {user.Id} \noch namn {user.Name} togs bort.");
+            Console.ForegroundColor = ConsoleColor.White;
+        }
     }
 }

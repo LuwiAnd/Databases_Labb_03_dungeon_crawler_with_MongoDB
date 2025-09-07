@@ -17,6 +17,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Interfaces
         Task<Game?> GetByIdAsync(string id);
         Task<List<Game>> GetAllAsync();
         Task<bool> DeleteAsync(string id);
+        Task<long> DeleteByUserAsync(User user);
         //Task<bool> UpdateAsync(Game game);
         Task<SaveResult> UpdateAsync(Game game);
     }

@@ -59,6 +59,16 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Implementa
             return result.DeletedCount > 0;
         }
 
+        public async Task<long> DeleteByUserAsync(User user)
+        {
+            if (user is null) throw new ArgumentNullException(nameof(user));
+            if (string.IsNullOrWhiteSpace(user.Id))
+                throw new ArgumentException("user.Id får inte vara tomt.", nameof(user));
+
+            var result = await _collection.DeleteManyAsync(g => g.UserId == user.Id);
+            return result.DeletedCount;
+        }
+
         
 
         //public async Task<bool> UpdateAsync(Game game)

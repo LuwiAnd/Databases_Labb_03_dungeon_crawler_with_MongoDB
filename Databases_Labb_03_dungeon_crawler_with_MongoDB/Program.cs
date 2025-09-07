@@ -121,7 +121,8 @@ namespace Labb_02_dungeon_crawler
                         {
                             "Skapa en ny användare.",
                             "Välj en befintlig användare.",
-                            "Visa Highscore-listan."
+                            "Visa Highscore-listan.",
+                            "Radera en användare och alla dess spel!"
                         };
                         while (optionTmp == null)
                         {
@@ -151,9 +152,13 @@ namespace Labb_02_dungeon_crawler
                             //Console.WriteLine("Skriv in ditt användarnamn (högst 10 tecken)");
                             selectedUser = await DatabaseService.CreateUserAsync(userRepo);
                         }
-                        else 
+                        else if(optionTmp.Value == 1)
                         {
                             selectedUser = await DatabaseService.LoadUserAsync(userRepo);
+                        }
+                        else if(optionTmp.Value == 3)
+                        {
+                            await DatabaseService.DeleteUserAndTheirGames(userRepo, gameRepo);
                         }
                     }
                     else
