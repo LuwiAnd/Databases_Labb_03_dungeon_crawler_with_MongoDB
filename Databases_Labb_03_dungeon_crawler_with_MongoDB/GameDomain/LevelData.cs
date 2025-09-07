@@ -253,6 +253,10 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
             {
                 if (drawAllElements || e.IsVisible || GeneralDungeonFunctions.IsVisible(Hero.Position, e.Position))
                 {
+                    if (e is Wall w)
+                    {
+                        w.IsVisible = true;
+                    }
                     e.Draw();
                 }
             }

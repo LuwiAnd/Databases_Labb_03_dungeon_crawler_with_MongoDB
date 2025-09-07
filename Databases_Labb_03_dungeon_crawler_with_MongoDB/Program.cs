@@ -259,6 +259,10 @@ namespace Labb_02_dungeon_crawler
                 if (currentLevelData == null) continue;
 
                 currentLevelData.RenderInitialFrame();
+                selectedGame!.LevelDataState = new LevelDataState(currentLevelData);
+                selectedGame.GameStatus = currentLevelData.GameStatus;
+                await gameRepo.UpdateAsync(selectedGame);
+
                 bool continueToPlay = await GameLoop.PlayGameAsync(
                     currentLevelData,
                     async ld =>
