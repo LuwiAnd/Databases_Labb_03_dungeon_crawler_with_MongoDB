@@ -18,6 +18,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.SaveModel
         [BsonElement("name")]
         public string? Name { get; set; } = "";
 
+        // Jag tror att jag endast använder CreatedAt för Game-objekt, men kanske intressant att spara här också.
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public User()

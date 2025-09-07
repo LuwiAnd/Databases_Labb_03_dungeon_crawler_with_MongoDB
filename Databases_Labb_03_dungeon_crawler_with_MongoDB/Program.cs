@@ -189,20 +189,7 @@ namespace Labb_02_dungeon_crawler
                         selectedUser = null; 
                         break;
                     }
-                    //switch (tmpSelected)
-                    //{
-                    //    case 0:
-                    //        Console.WriteLine("Du valde att starta ett nytt spel.");
-                    //        selectedLevel = await DatabaseService.LoadLevelAsync(levelRepo);
-                    //        break;
-                    //    case 1:
-                    //        Console.WriteLine("Du valde att ladda ett pågående spel.");
-                    //        selectedGame = await DatabaseService.LoadGameAsync(gameRepo, selectedUser);
-                    //        break;
-                    //    default:
-                    //        Console.WriteLine("Något gick fel. Du valde ett alternativ som inte finns.");
-                    //        break;
-                    //}
+                    
 
 
                     

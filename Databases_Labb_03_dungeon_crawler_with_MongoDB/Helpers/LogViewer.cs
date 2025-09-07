@@ -33,7 +33,12 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                     if (line != null && line.Length > Console.WindowWidth) line = line.Substring(0, Console.WindowWidth);
 
                     //if(!string.IsNullOrEmpty(line) && line.Substring(0, 5).ToUpper() == "PLAYER")
-                    if(!string.IsNullOrEmpty(line) && line.StartsWith("player", StringComparison.OrdinalIgnoreCase))
+                    //if(!string.IsNullOrEmpty(line) && line.StartsWith("player", StringComparison.OrdinalIgnoreCase))
+                    if(
+                        !string.IsNullOrEmpty(line) && 
+                        (
+                            line.StartsWith("player", StringComparison.OrdinalIgnoreCase) || 
+                            line.StartsWith("spel", StringComparison.OrdinalIgnoreCase)))
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
                     }

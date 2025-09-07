@@ -15,6 +15,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
 {
     internal class DatabaseService
     {
+        /* Ej asynkron.
         public static (IMongoCollection<User>, IMongoCollection<Level>, IMongoCollection<Game>) InitializeDatabase(IMongoDatabase db)
         {
             var users  = db.GetCollection<User>("users");
@@ -23,7 +24,9 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
 
             return (users, levels, games);
         }
+        */
 
+        /* Ej asynkron.
         public static void SaveUserToDb(IMongoCollection<User> users, User user)
         {
             try
@@ -37,7 +40,9 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                 Console.WriteLine(ex.Message);
             }
         }
+        */
 
+        /* Ej asynkron.
         public static void SaveToDb<T>(IMongoCollection<T> collection, T document)
         {
             object? GetId<T>(T doc)
@@ -57,7 +62,9 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                 Console.WriteLine(ex.Message);
             }
         }
+        */
 
+        /* Ej asynkron.
         // Den här versionen ska jag inte använda längre, eftersom jag använder repository pattern.
         public static void CreateUser(IMongoCollection<User> users)
         {
@@ -92,6 +99,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
             }
 
         }
+        */
 
 
         //public static async Task<User> CreateUserAsync(IUserRepository users)
