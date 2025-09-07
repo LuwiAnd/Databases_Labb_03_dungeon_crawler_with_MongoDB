@@ -1,5 +1,7 @@
-﻿using Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Interfaces;
+﻿using Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.Repositories.Interfaces;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.SaveModel;
+using Databases_Labb_03_dungeon_crawler_with_MongoDB.States;
 using Databases_Labb_03_dungeon_crawler_with_MongoDB.Types;
 using MongoDB.Driver;
 using System;
@@ -730,10 +732,163 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
 
             Console.ForegroundColor = ConsoleColor.Magenta;
             var removedGames = await games.DeleteByUserAsync(user);
-            Console.WriteLine($"Spelare hade {removedGames} som nu togs bort.");
+            Console.WriteLine($"Spelaren hade {removedGames} spel som nu togs bort.");
             var removedUsers = await users.DeleteAsync(user);
             Console.WriteLine($"{removedUsers} stycken spelare med id {user.Id} \noch namn {user.Name} togs bort.");
             Console.ForegroundColor = ConsoleColor.White;
         }
+
+
+
+        public static async Task AddDemoData(
+            IUserRepository users,
+            IGameRepository games,
+            ILevelRepository levels
+        )
+        {
+            var hasUsers = await users.HasElements();
+            var hasGames = (await games.GetAllAsync()).Any();
+            if (hasUsers || hasGames) return;
+
+
+            var allLevels = await levels.GetAllAsync();
+            if (allLevels.Count < 3)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Ingen Demodata genereras för att det finns färre än tre banor i databasen.");
+                Console.ForegroundColor = ConsoleColor.White;
+                return;
+            }
+
+            // Banor.
+            Level? level1 = FindLevelByName(allLevels, "1", "Level1", "Level 1");
+            Level? level2 = FindLevelByName(allLevels, "2", "Level2", "Level 2");
+            Level? level3 = FindLevelByName(allLevels, "3", "Level3", "Level 3");
+
+            if(level1 == null || level2 == null || level3 == null)
+            {
+                var sorted = allLevels.OrderBy(l => l.Name).ToList();
+                level1 = sorted.ElementAtOrDefault(0);
+                level2 = sorted.ElementAtOrDefault(1);
+                level3 = sorted.ElementAtOrDefault(2);
+            }
+
+
+            if (level1 is null || level2 is null || level3 is null)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Demodata hoppar över: kunde inte hitta tre banor.");
+                Console.ForegroundColor = ConsoleColor.White;
+                return;
+            }
+
+
+            // Användare
+            var anna = await users.CreateUserAsync(new User { Name = "Anna" });
+            var bosse = await users.CreateUserAsync(new User { Name = "Bosse" });
+
+            
+            // Spel
+            static LevelDataState BuildState(Level level, GameStatus status)
+            {
+                var ld = new LevelData();
+                ld.LoadFromLayout(level.Layout);
+                ld.GameStatus = status;
+                
+                return new LevelDataState(ld);
+            }
+
+            DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+
+            // --------
+            // ANNA: bana 1 (100p, Completed), bana 3 (300p, Completed)
+            await games.CreateAsync(new Game
+            {
+                UserId = anna.Id,
+                LevelId = level1.Id,
+                LevelDataState = BuildState(level1, GameStatus.Completed),
+                GameStatus = GameStatus.Completed,
+                Score = 100,
+                CompletedAt = today,
+                CreatedAt = DateTime.Now
+            });
+
+            await games.CreateAsync(new Game
+            {
+                UserId = anna.Id,
+                LevelId = level3.Id,
+                LevelDataState = BuildState(level3, GameStatus.Completed),
+                GameStatus = GameStatus.Completed,
+                Score = 300,
+                CompletedAt = today,
+                CreatedAt = DateTime.Now
+            });
+
+            // --------
+            // BOSSE: bana 2 (20p, HeroDead), bana 3 (30p, HeroDead), och ett pågående spel på bana 3
+            await games.CreateAsync(new Game
+            {
+                UserId = bosse.Id,
+                LevelId = level2.Id,
+                LevelDataState = BuildState(level2, GameStatus.HeroDead),
+                GameStatus = GameStatus.HeroDead,
+                Score = 20,
+                CompletedAt = today,
+                CreatedAt = DateTime.Now
+            });
+
+            await games.CreateAsync(new Game
+            {
+                UserId = bosse.Id,
+                LevelId = level3.Id,
+                LevelDataState = BuildState(level3, GameStatus.HeroDead),
+                GameStatus = GameStatus.HeroDead,
+                Score = 30,
+                CompletedAt = today,
+                CreatedAt = DateTime.Now
+            });
+
+            // Pågående
+            //await games.CreateAsync(new Game
+            //{
+            //    UserId = bosse.Id,
+            //    LevelId = level3.Id,
+            //    LevelDataState = BuildState(level3, GameStatus.Ongoing),
+            //    GameStatus = GameStatus.Ongoing,
+            //    Score = null,
+            //    CompletedAt = null,
+            //    CreatedAt = DateTime.Now
+            //});
+            //
+            // Jag byter ut ovanstående mot nedanstående för att kunna 
+            // uppdatera hjälten till att vara nära målet.
+            var bossesSpel = new Game
+            {
+                UserId = bosse.Id,
+                LevelId = level3.Id,
+                LevelDataState = BuildState(level3, GameStatus.Ongoing),
+                GameStatus = GameStatus.Ongoing,
+                Score = null,
+                CompletedAt = null,
+                CreatedAt = DateTime.Now
+            };
+            bossesSpel.LevelDataState.Hero.Position = new Position(50, 5);
+            await games.CreateAsync(bossesSpel);
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Demodata skapad.");
+            Console.ForegroundColor = ConsoleColor.White;
+
+            static Level? FindLevelByName(IEnumerable<Level> levels, params string[] candidateNames)
+            {
+                return levels.FirstOrDefault(l =>
+                    !string.IsNullOrWhiteSpace(l.Name) &&
+                    candidateNames.Any(c => string.Equals(l.Name.Trim(), c, StringComparison.OrdinalIgnoreCase))
+                );
+            }
+                
+        }
+
+
     }
 }

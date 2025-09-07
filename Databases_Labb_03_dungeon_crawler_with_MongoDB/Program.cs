@@ -70,8 +70,9 @@ namespace Labb_02_dungeon_crawler
             //string levelsFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Levels");
             await levelRepo.ImportLevelsFromFolderAsync();
 
-            //string? username;
-            //string? level;
+            await DatabaseService.AddDemoData(userRepo, gameRepo, levelRepo);
+
+
 
             User? selectedUser = null;
             Level? selectedLevel = null;

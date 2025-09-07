@@ -371,6 +371,8 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
                 $"{enemy.Type} (HP: {enemy.HP}) throw: {enemy.DefenceDice.ToString()} => {enemyDefence}. " + 
                 $"Damage = {enemyDamage}.";
 
+            message = GeneralDungeonFunctions.Translate(message);
+
             (int left, int top) = Console.GetCursorPosition();
             Console.SetCursorPosition(0, 1);
             Console.ForegroundColor = ConsoleColor.Green;

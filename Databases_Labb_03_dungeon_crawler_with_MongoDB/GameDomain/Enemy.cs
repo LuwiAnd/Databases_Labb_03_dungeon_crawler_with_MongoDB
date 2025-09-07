@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers;
+using System;
 //using System.Data;
 
 //using Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain;
@@ -36,9 +37,17 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.GameDomain
             hero.HP -= damage;
 
             var message =
-                $"{Type} (HP: {HP}) throws dices: {AttackDice.ToString()} => {attack}. " + 
-                $"Hero (HP: {hero.HP}) throws: {hero.DefenceDice.ToString()} => {defence}. " + 
+                $"{Type} (HP: {HP}) throws dices: {AttackDice.ToString()} => {attack}. " +
+                $"Hero (HP: {hero.HP}) throws: {hero.DefenceDice.ToString()} => {defence}. " +
                 $"Damage = {damage}.";
+
+            //var message =
+            //    $"{GeneralDungeonFunctions.Translate(Type)} (HP: {HP}) kastar tärningar: {AttackDice.ToString()} => {attack}. " +
+            //    $"{GeneralDungeonFunctions.Translate("Hero")} (HP: {hero.HP}) kastar tärningar: {hero.DefenceDice.ToString()} => {defence}. " +
+            //    $"Damage = {damage}.";
+
+            message = GeneralDungeonFunctions.Translate(message);
+
 
             (int left, int top) = Console.GetCursorPosition();
             Console.SetCursorPosition(0, 2);
