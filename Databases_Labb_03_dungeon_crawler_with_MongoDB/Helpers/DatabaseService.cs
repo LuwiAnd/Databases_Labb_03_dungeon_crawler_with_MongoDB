@@ -365,7 +365,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
 
             
 
-            Console.WriteLine("Välj en användare med hjälp av piltangenterna.");
+            Console.WriteLine("Markera en användare med hjälp av piltangenterna.");
             Console.WriteLine("Skriv en söksträng för att hitta en användare.");
             Console.WriteLine("Tryck på Enter för att välja den markerad användaren.");
             Console.WriteLine("Tryck på Esc för att gå till föregående meny utan att ladda en användare.");
@@ -660,7 +660,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
             }
 
             Console.WriteLine($"Du valde: {user.Name} med id {user.Id}.");
-            Console.WriteLine("Skriv lösenordet för att bekräfta borttagning (eller lämna tomt/tryck Esc för att avbryta).");
+            Console.WriteLine("Skriv lösenordet och tryck Enter för att bekräfta borttagning (eller tryck Esc för att avbryta).");
 
             (int left, int passwordRow) = Console.GetCursorPosition();
             string prompt = "Lösenord: ";

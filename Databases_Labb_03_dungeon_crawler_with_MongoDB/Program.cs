@@ -231,7 +231,7 @@ namespace Labb_02_dungeon_crawler
 
                         if (selectedGame == null)
                         {
-                            Console.WriteLine("Inget pågående spel hittades. Startar nytt i stället.");
+                            Console.WriteLine("Inget pågående spel hittades. Startar nytt istället.");
                             Thread.Sleep(3000);
                             var result = await GameCreationHelper.StartNewGameAsync(
                                 levelRepo, 

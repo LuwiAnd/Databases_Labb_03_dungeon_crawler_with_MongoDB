@@ -37,13 +37,14 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
             }
 
 
-            // För testning:
-            ongoingGames = allGames
-                .Where(g => g.UserId == userId && g.GameStatus == GameStatus.Ongoing)
-                .ToList();
-            Console.WriteLine("Nu ska det finnas noll sparade pågående spel för användaren.");
-            Console.WriteLine($"Användaren har {ongoingGames.Count} pågående spel!");
-            Thread.Sleep(3000);
+            //// För testning:
+            //allGames = await gameRepository.GetAllAsync();
+            //ongoingGames = allGames
+            //    .Where(g => g.UserId == userId && g.GameStatus == GameStatus.Ongoing)
+            //    .ToList();
+            //Console.WriteLine("Nu ska det finnas noll sparade pågående spel för användaren.");
+            //Console.WriteLine($"Användaren har {ongoingGames.Count} pågående spel!");
+            //Thread.Sleep(2000);
 
 
             var newGame = new Game

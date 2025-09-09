@@ -185,26 +185,36 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
             //int selected = 0;
             int numberOfOptions = options.Count;
 
-            void DrawDeselect(int option)
-            {
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.SetCursorPosition(0, option + row);
-                Console.Write(options[option]);
-            }
+            //void DrawDeselect(int option)
+            //{
+            //    Console.BackgroundColor = ConsoleColor.Black;
+            //    Console.SetCursorPosition(0, option + row);
+            //    Console.Write(options[option]);
+            //}
 
-            void DrawSelect(int option)
-            {
-                Console.BackgroundColor = ConsoleColor.DarkGray;
-                Console.SetCursorPosition(0, option + row);
-                Console.Write(options[option]);
-            }
+            //void DrawSelect(int option)
+            //{
+            //    Console.BackgroundColor = ConsoleColor.DarkGray;
+            //    Console.SetCursorPosition(0, option + row);
+            //    Console.Write(options[option]);
+            //}
 
             void DrawBigList()
             {
+                //if(options.Count < 10)
+                //{
+                //    Console.WriteLine("Anropade DrawBigList() trots att listan är liten (<10 alternativ).");
+                //    return;
+                //}
+
                 //Console.Clear();
                 ClearMenu();
                 Console.SetCursorPosition(left: 0, top: row);
-                if(selected < 5)
+
+                // Detta visar 4 alternativ över select och 5 alternativ under om
+                // det finns så många alternativ före och efter select, men jag
+                // visar alltid lika många alternativ för en given lista.
+                if(selected < 5 || options.Count < 10)
                 {
                     for(int i = 0; i < selected; i++)
                     {
@@ -230,14 +240,14 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                     Console.WriteLine(options[selected]);
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.ForegroundColor = ConsoleColor.White;
-                    for (int i = selected + 1; i < Math.Min(numberOfOptions, 10); i++)
+                    for (int i = selected + 1; i < options.Count; i++)
                     {
                         Console.WriteLine(options[i]);
                     }
                 }
                 else
                 {
-                    for (int i = 0; i < selected; i++)
+                    for (int i = selected - 4; i < selected; i++)
                     {
                         Console.WriteLine(options[i]);
                     }
@@ -246,7 +256,7 @@ namespace Databases_Labb_03_dungeon_crawler_with_MongoDB.Helpers
                     Console.WriteLine(options[selected]);
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.ForegroundColor = ConsoleColor.White;
-                    for (int i = selected + 1; i < 10; i++)
+                    for (int i = selected + 1; i < selected + 6; i++)
                     {
                         Console.WriteLine(options[i]);
                     }
